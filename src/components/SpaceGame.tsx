@@ -6,6 +6,7 @@ export default function SpaceGame() {
   const [score, setScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [highScore, setHighScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
   const gameStateRef = useRef({
     player: { x: 0, y: 0, width: 30, height: 30, speed: 5 },
     bullets: [] as { x: number; y: number }[],
@@ -76,15 +77,15 @@ export default function SpaceGame() {
   const updateGameState = useCallback(() => {
     const gameState = gameStateRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    
+    if (!canvas) return true;
+
     // Move player towards mouse X position
     if (gameState.mousePosition.x > gameState.player.x + gameState.player.width / 2 + 5) {
       gameState.player.x += gameState.player.speed;
     } else if (gameState.mousePosition.x < gameState.player.x + gameState.player.width / 2 - 5) {
       gameState.player.x -= gameState.player.speed;
     }
-    
+
     // Keep player within canvas bounds
     if (gameState.player.x < 0) gameState.player.x = 0;
     if (gameState.player.x > canvas.width - gameState.player.width) {
@@ -101,17 +102,9 @@ export default function SpaceGame() {
       }
     }
 
-    // Lightning effect
-    if (gameState.lightningEffect.active) {
-      gameState.lightningEffect.duration--;
-      if (gameState.lightningEffect.duration <= 0) {
-        gameState.lightningEffect.active = false;
-      }
-    }
-
-    // Spawn enemies (with reduced spawn rate for performance)
-    const spawnRate = 0.005 + Math.min(score / 3000, 0.02); // Significantly lower spawn rate
-    if (Math.random() < spawnRate && gameState.enemies.length < 5) { // Cap max enemies at 5
+    // Spawn enemies
+    const spawnRate = 0.02 + Math.min(score / 2000, 0.03);
+    if (Math.random() < spawnRate && gameState.enemies.length < 5) {
       const enemyWidth = 40 + Math.floor(Math.random() * 20);
       const enemyHeight = 30 + Math.floor(Math.random() * 15);
       
@@ -121,7 +114,7 @@ export default function SpaceGame() {
         width: enemyWidth,
         height: enemyHeight,
         health: 1 + Math.floor(score / 1000),
-        speed: 1 + Math.random() * 1.5 // Slower for better performance
+        speed: 1 + Math.random() * 1.5
       });
     }
 
@@ -131,6 +124,7 @@ export default function SpaceGame() {
       enemy.y += enemy.speed;
 
       // Check collision with bullets
+      let enemyHit = false;
       for (let j = gameState.bullets.length - 1; j >= 0; j--) {
         const bullet = gameState.bullets[j];
         if (bullet.x > enemy.x && 
@@ -145,16 +139,17 @@ export default function SpaceGame() {
             gameState.enemies.splice(i, 1);
             setScore(prev => prev + 10);
             
-            // Less frequent lightning effects for performance
-            if (Math.random() < 0.1) { // Reduced chance
+            if (Math.random() < 0.1) {
               const ctx = canvas.getContext('2d');
               if (ctx) drawLightning(ctx, enemy.x, enemy.y);
             }
-            
+            enemyHit = true;
             break;
           }
         }
       }
+
+      if (enemyHit) continue;
 
       // Check collision with player
       if (enemy.y + enemy.height > gameState.player.y &&
@@ -162,8 +157,8 @@ export default function SpaceGame() {
           enemy.x + enemy.width > gameState.player.x &&
           enemy.y < gameState.player.y + gameState.player.height) {
         
-        // Game over
         setHighScore(prev => Math.max(prev, score));
+        setGameOver(true);
         setGameStarted(false);
         return false;
       }
@@ -251,6 +246,14 @@ export default function SpaceGame() {
       ctx.arc(enemy.x + enemy.width - 10, enemy.y + 10, 5, 0, Math.PI * 2);
       ctx.fill();
     }
+
+    // Add fog effect
+    const fogGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    fogGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)'); // More transparent at top
+    fogGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.2)'); // Slightly more fog in middle
+    fogGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)'); // More fog at bottom but still transparent
+    ctx.fillStyle = fogGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
   
   useEffect(() => {
@@ -291,7 +294,7 @@ export default function SpaceGame() {
         y: gameStateRef.current.player.y
       });
       
-      // Play sound effect - keeping the basic functionality
+      // Play sound effect
       const audio = new Audio('https://www.myinstants.com/media/sounds/laser.mp3');
       audio.volume = 0.2;
       audio.play();
@@ -342,17 +345,21 @@ export default function SpaceGame() {
     <div className="min-h-screen pt-20 px-4 relative">
       <RetroFrame className="max-w-2xl mx-auto" variant="dark">
         <div className="text-center">
-          <p className="font-vt323 text-xl text-pink-500 mb-4">SCORE: <span className="text-cyan-400">{score}</span> | HI-SCORE: <span className="text-cyan-400">{highScore}</span></p>
+          <p className="font-vt323 text-xl text-pink-500 mb-4">
+            SCORE: <span className="text-cyan-400">{score}</span> | 
+            HI-SCORE: <span className="text-cyan-400">{highScore}</span>
+          </p>
           
           {!gameStarted ? (
             <button
               onClick={() => {
                 setGameStarted(true);
+                setGameOver(false);
                 setScore(0);
               }}
               className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 text-xl px-6 py-3 rounded-lg transition-all mb-4 tracking-widest glow-button"
             >
-              START GAME
+              {gameOver ? 'TRY AGAIN' : 'START GAME'}
             </button>
           ) : null}
           
@@ -361,11 +368,10 @@ export default function SpaceGame() {
               ref={canvasRef}
               width={600}
               height={400}
-              className="cursor-crosshair mx-auto"
+              className="cursor-crosshair mx-auto w-full max-w-[600px] h-auto"
               style={{ backgroundColor: '#080010' }}
             />
             
-            {/* Scanline effect over canvas */}
             <div className="absolute inset-0 pointer-events-none scanline"></div>
           </div>
           
