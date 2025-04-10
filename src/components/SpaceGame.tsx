@@ -103,7 +103,7 @@ export default function SpaceGame() {
     }
 
     // Spawn enemies
-    const spawnRate = 0.02 + Math.min(score / 2000, 0.03);
+    const spawnRate = 0.03; // Fixed spawn rate
     if (Math.random() < spawnRate && gameState.enemies.length < 5) {
       const enemyWidth = 40 + Math.floor(Math.random() * 20);
       const enemyHeight = 30 + Math.floor(Math.random() * 15);
@@ -341,6 +341,12 @@ export default function SpaceGame() {
     };
   }, [gameStarted, drawLaserBeam, updateGameState, renderGame]);
 
+  const startGame = () => {
+    setGameStarted(true);
+    setGameOver(false);
+    setScore(0);
+  };
+
   return (
     <div className="min-h-screen pt-20 px-4 relative">
       <RetroFrame className="max-w-2xl mx-auto" variant="dark">
@@ -352,26 +358,21 @@ export default function SpaceGame() {
           
           {!gameStarted ? (
             <button
-              onClick={() => {
-                setGameStarted(true);
-                setGameOver(false);
-                setScore(0);
-              }}
+              onClick={startGame}
               className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 text-xl px-6 py-3 rounded-lg transition-all mb-4 tracking-widest glow-button"
             >
               {gameOver ? 'TRY AGAIN' : 'START GAME'}
             </button>
           ) : null}
           
-          <div className="relative">
+          <div className="relative w-full max-w-[600px] mx-auto aspect-[3/2]">
             <canvas
               ref={canvasRef}
               width={600}
               height={400}
-              className="cursor-crosshair mx-auto w-full max-w-[600px] h-auto"
+              className="absolute top-0 left-0 w-full h-full cursor-crosshair"
               style={{ backgroundColor: '#080010' }}
             />
-            
             <div className="absolute inset-0 pointer-events-none scanline"></div>
           </div>
           
