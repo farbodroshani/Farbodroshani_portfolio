@@ -743,202 +743,494 @@
   100% { transform: translate(50px, -50px) rotate(225deg); }
 }
 
-/* Add transparent game styles */
-.game-container {
-  position: relative;
-}
-
-.game-backdrop {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(8, 0, 16, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 4px;
-  z-index: 0;
-}
-
-/* Update scanline for better visibility on transparent background */
-.scanline {
-  background: linear-gradient(
-    to bottom,
-    transparent 50%,
-    rgba(0, 255, 255, 0.3) 51%,
-    transparent 51%
-  );
-  background-size: 100% 4px;
-  opacity: 0.5;
-}
-
-/* Update the game section background for better visibility */
-.game-section-background {
-  position: relative;
-  background-color: rgba(0, 150, 150, 0.4) !important; /* Force with !important */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: inset 0 0 100px 20px rgba(0, 100, 100, 0.5);
-  padding: 20px 0;
-  border-top: 1px solid rgba(0, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
-  z-index: 10;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-/* Make sure this pseudo-element is defined correctly */
-.game-section-background::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  box-shadow: 0 0 50px 10px rgba(0, 254, 255, 0.4);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Bio section enhanced background */
-.bio-section-background {
-  position: relative;
-  background-color: rgba(75, 42, 90, 0.5); /* More visible purple background */
-  backdrop-filter: blur(8px); 
-  -webkit-backdrop-filter: blur(8px);
-  position: relative;
-  z-index: 10;
-  box-shadow: inset 0 0 100px 20px rgba(183, 110, 121, 0.3); /* Inner glow with pink hue */
-  padding: 20px 0;
-  border-top: 1px solid rgba(255, 0, 255, 0.3);
-  border-bottom: 1px solid rgba(255, 0, 255, 0.3);
-}
-
-/* Add a specific neon glow to the edges of the bio section */
-.bio-section-background::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  box-shadow: 0 0 50px 10px rgba(255, 0, 255, 0.3);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Custom very transparent backdrop for bio section */
-.custom-bio-backdrop {
-  background-color: rgba(75, 42, 90, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(255, 0, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 0, 255, 0.1);
-  margin: 20px 0;
-}
-
-/* Custom very transparent backdrop for game section */
-.custom-game-backdrop {
-  background-color: rgba(0, 150, 150, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(0, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
-  margin: 20px 0;
-}
-
-/* Additional style to ensure buttons are fully visible */
-.initialize-button {
-  display: inline-block;
-  background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
-  color: white;
-  font-family: 'VT323', monospace;
-  font-size: 20px;
-  padding: 16px 32px;
-  border-radius: 8px;
-  letter-spacing: 2px;
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
-  position: relative;
-  z-index: 20;
-  width: auto;
-  min-width: 250px;
-  margin: 20px 0;
-  overflow: visible;
-}
-
-/* Fix any container overflow issues throughout the site */
-section, div {
-  overflow-y: visible;
-}
-
-/* Fix any button positioning issues */
-button {
-  position: relative;
-  z-index: 20;
-}
-
-/* Force black background on canvas */
-canvas {
-  background-color: #080010 !important;
-}
-
-/* Game-specific RetroFrame styling with black background */
-.game-frame .relative.bg-gunmetal\/80,
-.game-frame div[class*="bg-gunmetal"] {
-  background-color: #080010 !important; /* Override with cyberpunk-black */
-}
-
-/* Make sure the RetroFrame corners for the game are colored correctly */
-.game-frame div[class*="border-dusty-pink"] {
-  border-color: #ff00ff !important; /* neon-pink */
-}
-
-/* Keyframe animations for pixelated creatures */
-@keyframes floatLeft {
-  0% { transform: translate(-50px, 0); }
-  25% { transform: translate(50px, -50px); }
-  50% { transform: translate(100px, 0); }
-  75% { transform: translate(50px, 50px); }
-  100% { transform: translate(-50px, 0); }
-}
-
-@keyframes floatRight {
-  0% { transform: translate(50px, 0) rotate(180deg); }
-  25% { transform: translate(-50px, 50px) rotate(180deg); }
-  50% { transform: translate(-100px, 0) rotate(180deg); }
-  75% { transform: translate(-50px, -50px) rotate(180deg); }
-  100% { transform: translate(50px, 0) rotate(180deg); }
-}
-
-@keyframes floatUp {
-  0% { transform: translate(0, 50px); }
-  25% { transform: translate(-50px, -50px); }
-  50% { transform: translate(0, -100px); }
-  75% { transform: translate(50px, -50px); }
-  100% { transform: translate(0, 50px); }
-}
-
-@keyframes floatDown {
-  0% { transform: translate(0, -50px); }
-  25% { transform: translate(50px, 50px); }
-  50% { transform: translate(0, 100px); }
-  75% { transform: translate(-50px, 50px); }
-  100% { transform: translate(0, -50px); }
-}
-
-@keyframes floatDiagonal {
-  0% { transform: translate(-50px, 50px); }
-  25% { transform: translate(50px, 0); }
-  50% { transform: translate(100px, -50px); }
-  75% { transform: translate(50px, 0); }
-  100% { transform: translate(-50px, 50px); }
-}
-
-@keyframes floatDiagonalReverse {
-  0% { transform: translate(50px, -50px) rotate(225deg); }
-  25% { transform: translate(-50px, 0) rotate(225deg); }
-  50% { transform: translate(-100px, 50px) rotate(225deg); }
-  75% { transform: translate(-50px, 0) rotate(225deg); }
-  100% { transform: translate(50px, -50px) rotate(225deg); }
-}
-
 @keyframes wobble {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   25% { transform: translateY(-5px) rotate(-5deg); }
   75% { transform: translateY(5px) rotate(5deg); }
+}
+
+/* VHS Tracking Effect */
+@keyframes vhs-tracking {
+  0% {
+    transform: translateY(-100%);
+    height: 4px;
+    opacity: 0;
+  }
+  5% {
+    transform: translateY(0);
+    height: 12px;
+    opacity: 0.7;
+  }
+  25% {
+    height: 4px;
+    opacity: 0.5;
+  }
+  45% {
+    height: 8px;
+    opacity: 0.65;
+  }
+  55% {
+    height: 4px;
+    opacity: 0.5;
+  }
+  65% {
+    transform: translateY(0);
+    height: 10px;
+    opacity: 0.7;
+  }
+  75% {
+    height: 6px;
+    opacity: 0.5;
+  }
+  90% {
+    height: 8px;
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100%);
+    height: 2px;
+    opacity: 0;
+  }
+}
+
+.vhs-tracking-top, .vhs-tracking-bottom {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,0,255,0.3), rgba(0,255,255,0.3), rgba(255,255,255,0.1));
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.vhs-tracking-top {
+  top: 0;
+}
+
+.vhs-tracking-bottom {
+  bottom: 0;
+}
+
+.vhs-tracking-active {
+  animation: vhs-tracking 2.5s ease-in-out forwards;
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #00ffff;
+}
+
+.loading-text {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.loading-bar-container {
+  width: 80%;
+  max-width: 500px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #ff00ff;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffff, #ff00ff);
+  transition: width 0.5s ease-in-out;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.loading-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
+/* Data Transmission Animation */
+@keyframes data-flow {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 100% 100%;
+    opacity: 0;
+  }
+}
+
+.data-transmission {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(45deg, 
+                 transparent 0%, 
+                 transparent 48%, 
+                 rgba(0, 255, 255, 0.1) 50%, 
+                 transparent 52%, 
+                 transparent 100%);
+  background-size: 10px 10px;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+}
+
+.data-transmission-active {
+  animation: data-flow 2s linear;
+}
+
+/* Add styles for the retro container on the Artifacts page */
+.retro-container {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ff00ff;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+}
+
+.retro-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.retro-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 80px rgba(255, 0, 255, 0.5);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Add styles for the game container on the Dragon Combat page */
+.game-container {
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.grid-overlay {
+  background-image: linear-gradient(to right, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Home page section styling */
+.custom-bio-backdrop {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+.custom-game-backdrop {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(10, 10, 30, 0.3);
+  backdrop-filter: blur(3px);
+}
+
+/* Terminal styles */
+.terminal-section {
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+  min-height: 600px;
+  transition: none;
+  will-change: auto;
+}
+
+.terminal-cursor {
+  animation: cursor-blink 1s infinite;
+}
+
+/* Terminal cursor blink */
+@keyframes cursor-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Binary background for loading screen */
+.binary-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.binary-line {
+  position: absolute;
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  color: rgba(0, 255, 255, 0.3);
+  animation: binary-float linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes binary-float {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50px);
+  }
+}
+
+.glitch-text {
+  position: relative;
+  animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+  }
+  91% {
+    transform: translate(-2px, 1px);
+    text-shadow: -2px 0 red;
+  }
+  93% {
+    transform: translate(2px, -1px);
+    text-shadow: 2px 0 blue;
+  }
+  95% {
+    transform: translate(-2px, -1px);
+    text-shadow: 2px 0 green;
+  }
+  97% {
+    transform: translate(2px, 1px);
+    text-shadow: -2px 0 yellow;
+  }
+}
+
+/* Screen distortion effect */
+@keyframes screen-distortion {
+  0% {
+    transform: translateX(0);
+    filter: hue-rotate(0deg);
+  }
+  10% {
+    transform: translateX(-5px);
+    filter: hue-rotate(45deg);
+  }
+  20% {
+    transform: translateX(5px);
+    filter: hue-rotate(-45deg);
+  }
+  30% {
+    transform: translateX(-3px);
+    filter: hue-rotate(30deg);
+  }
+  40% {
+    transform: translateX(3px);
+    filter: hue-rotate(-30deg);
+  }
+  50% {
+    transform: translateX(-1px);
+    filter: hue-rotate(15deg);
+  }
+  60% {
+    transform: translateX(1px);
+    filter: hue-rotate(-15deg);
+  }
+  100% {
+    transform: translateX(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+.screen-distortion {
+  animation: screen-distortion 0.5s linear;
+  position: relative;
+}
+
+/* Heading Glitch Effect */
+.glitch-heading {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-active {
+  animation: heading-glitch 0.8s ease-in-out;
+}
+
+@keyframes heading-glitch {
+  0% {
+    transform: translate(0);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+  }
+  20% {
+    transform: translate(-3px, 0);
+    text-shadow: -2px 0 #ff00ff, 2px 2px #00ffff;
+  }
+  22% {
+    transform: translate(3px, 0);
+    text-shadow: 2px 0 #00ffff, -2px -2px #ff00ff;
+  }
+  40% {
+    transform: translate(-2px, 0);
+    text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+  }
+  42% {
+    transform: translate(0, 0);
+    text-shadow: -1px 0 #00ffff, 1px 0 #ff00ff;
+  }
+  60% {
+    transform: translate(2px, 0);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+  }
+  80% {
+    transform: translate(-1px, 0);
+    text-shadow: 1px -1px #ff00ff, -1px 1px #00ffff;
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+  }
+}
+
+/* Text layer glitch effect for more dramatic headings */
+.glitch-text-layers {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text-layers::before,
+.glitch-text-layers::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.glitch-text-layers::before {
+  color: #ff00ff;
+  z-index: -1;
+}
+
+.glitch-text-layers::after {
+  color: #00ffff;
+  z-index: -2;
+}
+
+.glitch-text-active::before {
+  animation: glitch-layer1 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+.glitch-text-active::after {
+  animation: glitch-layer2 0.3s cubic-bezier(.25, .46, .45, .94) reverse both infinite;
+}
+
+@keyframes glitch-layer1 {
+  0% {
+    transform: translate(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-5px, 2px);
+    opacity: 0.3;
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(5px, 2px);
+    opacity: 0.3;
+  }
+  80% {
+    transform: translate(3px, -2px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0);
+    opacity: 0;
+  }
+}
+
+@keyframes glitch-layer2 {
+  0% {
+    transform: translate(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(5px, -2px);
+    opacity: 0.3;
+  }
+  40% {
+    transform: translate(2px, 2px);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-5px, -2px);
+    opacity: 0.3;
+  }
+  80% {
+    transform: translate(-3px, 2px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0);
+    opacity: 0;
+  }
 }

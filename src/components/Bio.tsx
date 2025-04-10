@@ -78,42 +78,42 @@ export default function Bio() {
           
           {/* Stats bars */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
                 <span className="font-vt323 text-neon-cyan">CODING POWER</span>
                 <span className="font-vt323 text-neon-pink">9000+</span>
               </div>
-              <div className="h-4 bg-cyberpunk-black/50 rounded overflow-hidden">
+              <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan" style={{width: '95%'}}></div>
               </div>
             </div>
             
-            <div>
+            <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
                 <span className="font-vt323 text-neon-cyan">DRAGON ENERGY</span>
                 <span className="font-vt323 text-neon-pink">87%</span>
               </div>
-              <div className="h-4 bg-cyberpunk-black/50 rounded overflow-hidden">
+              <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan" style={{width: '87%'}}></div>
               </div>
             </div>
             
-            <div>
+            <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
                 <span className="font-vt323 text-neon-cyan">COMBAT REFLEXES</span>
                 <span className="font-vt323 text-neon-pink">LETHAL</span>
               </div>
-              <div className="h-4 bg-cyberpunk-black/50 rounded overflow-hidden">
+              <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink" style={{width: '100%'}}></div>
               </div>
             </div>
             
-            <div>
+            <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
                 <span className="font-vt323 text-neon-cyan">COFFEE CONSUMED</span>
                 <span className="font-vt323 text-neon-pink">∞</span>
               </div>
-              <div className="h-4 bg-cyberpunk-black/50 rounded overflow-hidden">
+              <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan animate-pulse" style={{width: '100%'}}></div>
               </div>
             </div>

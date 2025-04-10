@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, Menu, X, Instagram } from 'lucide-react';
+import { Github, Linkedin, Mail, Menu, X, Instagram, Home } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import GlitchText from './GlitchText';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,14 +11,25 @@ export default function Navbar() {
     <nav className="fixed w-full z-50 bg-cyberpunk-black/80 backdrop-blur-sm border-b-2 border-neon-pink">
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="font-vt323 text-2xl text-neon-cyan tracking-widest glow-text-cyan"
-          >
-            DRAGON::TERMINAL
-          </motion.div>
+          {/* Logo - now links to home with hover effect */}
+          <Link to="/">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              whileHover={{ scale: 1.05, textShadow: "0 0 15px #00ffff" }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="font-vt323 text-2xl text-neon-cyan tracking-widest glow-text-cyan cursor-pointer flex items-center gap-2"
+            >
+              <Home size={20} className="inline-block text-neon-cyan" />
+              <GlitchText 
+                intensity="subtle" 
+                triggerProbability={0.2} 
+                triggerInterval={8000}
+              >
+                DRAGON::COMMAND
+              </GlitchText>
+            </motion.div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -58,9 +71,14 @@ export default function Navbar() {
 function NavLinks() {
   return (
     <>
-      <a href="/" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">DIMENSION_01</a>
-      <a href="/projects" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">ARTIFACTS</a>
-      <a href="/game" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">DRAGON_COMBAT</a>
+      <Link to="/" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">HOME</Link>
+      <Link to="/dimension" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">
+        <GlitchText intensity="subtle" triggerProbability={0.15} triggerInterval={10000}>
+          DIMENSION_01
+        </GlitchText>
+      </Link>
+      <Link to="/projects" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">ARTIFACTS</Link>
+      <Link to="/game" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">DRAGON_COMBAT</Link>
     </>
   );
 }

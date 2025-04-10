@@ -1,59 +1,78 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import dragonImage from '../assets/dragon.png';
+import GlitchText from './GlitchText';
 
 export default function Hero() {
+  const [showDragon, setShowDragon] = useState(true);
+  
+  useEffect(() => {
+    // Simple interval to toggle dragon visibility
+    const interval = setInterval(() => {
+      setShowDragon(prev => !prev);
+    }, showDragon ? 5000 : 10000);
+    
+    // Clear interval when component unmounts
+    return () => clearInterval(interval);
+  }, [showDragon]); // Re-run effect when showDragon changes
+  
   return (
-    <section className="relative min-h-screen bg-gradient-to-b from-cyberpunk-dark to-cyberpunk-darker flex items-center justify-center overflow-visible pb-20">
-      {/* Animated fog effect */}
-      <div className="absolute inset-0 opacity-50">
-        <div className="absolute inset-0 animate-fog-1 bg-gradient-radial from-transparent via-neon-pink/10 to-transparent" />
-        <div className="absolute inset-0 animate-fog-2 bg-gradient-radial from-transparent via-neon-cyan/10 to-transparent" />
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16 pb-24">
+      <div className="absolute inset-0 z-0">
+        {/* Grid background */}
+        <div className="absolute inset-0 bg-grid opacity-10"></div>
+        
+        {/* Abstract shapes */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-neon-cyan/20 rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-neon-pink/20 rounded-full filter blur-3xl"></div>
       </div>
-
-      <div className="vhs-effect w-full max-w-4xl mx-auto px-4 py-10">
-        <motion.div
+      
+      <div className="container px-4 z-10">
+        <motion.div 
+          className="text-center max-w-5xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center"
         >
-          <h1 className="font-vt323 text-6xl md:text-8xl mb-4 text-white tracking-wider glow-text-cyan">
-            <span className="text-neon-pink glow-text-pink">&gt;</span> FARBOD ROSHANI
+          <h1 className="font-vt323 text-6xl md:text-8xl text-neon-cyan tracking-widest glow-text-cyan mb-4">
+            <GlitchText intensity="intense" triggerProbability={0.4} triggerInterval={3500}>
+              FARBOD ROSHANI
+            </GlitchText>
           </h1>
           
-          <div className="font-vt323 text-2xl md:text-3xl text-white opacity-80 mb-8 tracking-widest">
-            <span className="text-neon-pink glow-text-pink">$</span> <span className="text-neon-cyan glow-text-cyan">CYBER DRAGON OPERATIVE</span>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
-            className="mb-10 py-5"
-          >
-            {/* Explicitly styled button with margins and z-index */}
-            <button 
-              style={{
-                background: 'linear-gradient(to right, #ff00ff, #b000ff)',
-                color: 'white',
-                fontFamily: '"VT323", monospace',
-                fontSize: '20px',
-                padding: '16px 32px',
-                borderRadius: '8px',
-                letterSpacing: '2px',
-                boxShadow: '0 0 15px rgba(255, 0, 255, 0.5)',
-                margin: '20px 0',
-                position: 'relative',
-                zIndex: 20,
-                display: 'inline-block',
-                width: 'auto',
-                minWidth: '250px',
-                overflow: 'visible'
-              }}
+          <h2 className="font-bodoni-moda text-2xl md:text-3xl text-white/90 mb-8">
+            <GlitchText intensity="subtle" triggerProbability={0.2} triggerInterval={7000}>
+              CYBERNETIC DEVELOPMENT SPECIALIST
+            </GlitchText>
+          </h2>
+          
+          <div className="w-48 h-1 bg-gradient-to-r from-neon-pink to-neon-cyan mx-auto mb-8"></div>
+          
+          <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-12 font-inter">
+            Welcome to my digital nexus. I specialize in crafting robust interfaces and digital experiences that merge function and aesthetic. My code transforms ideas into reality.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-4">
+            <motion.a 
+              href="#projects"
+              className="bg-neon-cyan/20 text-neon-cyan border-2 border-neon-cyan/50 py-3 px-8 font-vt323 text-xl tracking-wide rounded-sm hover:bg-neon-cyan/30 transition-colors relative overflow-hidden group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
-              INITIALIZE SEQUENCE
-            </button>
-          </motion.div>
+              <span className="relative z-10">VIEW PROJECTS</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+            </motion.a>
+            
+            <motion.a 
+              href="#contact"
+              className="bg-neon-pink/20 text-neon-pink border-2 border-neon-pink/50 py-3 px-8 font-vt323 text-xl tracking-wide rounded-sm hover:bg-neon-pink/30 transition-colors relative overflow-hidden group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="relative z-10">INITIATE CONTACT</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-pink/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+            </motion.a>
+          </div>
         </motion.div>
       </div>
 
@@ -83,19 +102,24 @@ export default function Hero() {
         className="absolute bottom-1/4 left-1/4 w-40 h-40 bg-gradient-to-tl from-neon-cyan/20 to-transparent rounded-full blur-xl"
       />
       
-      {/* PNG Dragon Image */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute bottom-10 w-48 h-48 left-1/2 transform -translate-x-1/2"
-      >
-        <img 
-          src={dragonImage} 
-          alt="Cyber Dragon"
-          className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
-        />
-      </motion.div>
+      {/* PNG Dragon Image with appear/disappear animation */}
+      <AnimatePresence>
+        {showDragon && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.8 }}
+            className="absolute bottom-10 w-48 h-48 left-0 right-0 mx-auto flex items-center justify-center"
+          >
+            <img 
+              src={dragonImage} 
+              alt="Cyber Dragon"
+              className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
