@@ -379,6 +379,40 @@ export default function SpaceGame() {
           <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
             MOVE: MOUSE | FIRE: CLICK
           </div>
+          
+          {/* Fanbase of Bombardiro Crocodilo! */}
+          <div className="mt-10 relative overflow-hidden">
+            <div className="text-center">
+              <h3 className="font-vt323 text-2xl text-neon-pink mb-4 tracking-widest glow-text-pink">
+                FANBASE OF BOMBARDIRO CROCODILO!
+              </h3>
+              <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-6"></div>
+            </div>
+            
+            <div className="bg-cyberpunk-black/40 border-2 border-neon-cyan glow-border-cyan p-4 rounded-lg relative">
+              <div className="absolute -right-8 -top-8 w-24 h-24 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full blur-xl opacity-30"></div>
+              <div className="absolute -left-8 -bottom-8 w-24 h-24 bg-gradient-to-tl from-neon-cyan to-neon-blue rounded-full blur-xl opacity-30"></div>
+              
+              <p className="text-white font-vt323 text-lg mb-4 relative z-10">
+                <span className="text-neon-pink">&gt; </span>
+                Official member of the legendary Bombardiro Crocodilo fan community. Fighting for digital justice and pixel perfection across the multiverse.
+              </p>
+              
+              <div className="flex justify-center items-center space-x-3 relative z-10">
+                <div className="px-3 py-1 bg-neon-pink/20 text-neon-pink font-vt323 rounded-md border border-neon-pink text-sm">
+                  #BOMBARDIRO
+                </div>
+                <div className="px-3 py-1 bg-neon-cyan/20 text-neon-cyan font-vt323 rounded-md border border-neon-cyan text-sm">
+                  #CROCODILO
+                </div>
+                <div className="px-3 py-1 bg-neon-purple/20 text-neon-purple font-vt323 rounded-md border border-neon-purple text-sm">
+                  #PIXELFANS
+                </div>
+              </div>
+              
+              <div className="scanline absolute inset-0 pointer-events-none"></div>
+            </div>
+          </div>
         </div>
       </RetroFrame>
     </div>

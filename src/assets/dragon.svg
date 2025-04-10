@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Dragon body -->
+  <path
+    d="M20,60 C20,40 40,30 50,30 C60,30 80,40 80,60 C80,80 70,85 50,85 C30,85 20,80 20,60 Z"
+    fill="#0ff"
+    stroke="#f0f"
+    strokeWidth="2"
+  />
+  <!-- Dragon head -->
+  <path
+    d="M80,60 C85,55 90,50 85,45 C80,40 70,45 65,50 C60,55 60,65 65,70 C70,75 75,65 80,60 Z"
+    fill="#0ff"
+    stroke="#f0f"
+    strokeWidth="2"
+  />
+  <!-- Dragon eye -->
+  <circle cx="75" cy="55" r="3" fill="#f0f" />
+  <!-- Dragon wings -->
+  <path
+    d="M50,40 C40,20 30,10 20,15 C10,20 15,30 25,35 C35,40 45,40 50,40 Z"
+    fill="#0ff"
+    stroke="#f0f"
+    strokeWidth="2"
+  />
+  <path
+    d="M50,40 C60,20 70,10 80,15 C90,20 85,30 75,35 C65,40 55,40 50,40 Z"
+    fill="#0ff"
+    stroke="#f0f"
+    strokeWidth="2"
+  />
+  <!-- Dragon tail -->
+  <path
+    d="M30,70 C20,75 10,80 5,75 C0,70 5,65 10,60 C15,55 25,55 30,60 Z"
+    fill="#0ff"
+    stroke="#f0f"
+    strokeWidth="2"
+  />
+  <!-- Dragon spikes -->
+  <path
+    d="M50,30 L50,20 M55,32 L58,25 M45,32 L42,25 M60,35 L65,30 M40,35 L35,30"
+    stroke="#f0f"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+</svg> 

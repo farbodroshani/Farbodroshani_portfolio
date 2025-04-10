@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import dragonImage from '../assets/dragon.png';
 
 export default function Hero() {
   return (
@@ -81,6 +82,20 @@ export default function Hero() {
         }}
         className="absolute bottom-1/4 left-1/4 w-40 h-40 bg-gradient-to-tl from-neon-cyan/20 to-transparent rounded-full blur-xl"
       />
+      
+      {/* PNG Dragon Image */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="absolute bottom-10 w-48 h-48 left-1/2 transform -translate-x-1/2"
+      >
+        <img 
+          src={dragonImage} 
+          alt="Cyber Dragon"
+          className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
+        />
+      </motion.div>
     </section>
   );
 }
