@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import RetroFrame from './RetroFrame';
 import { Instagram } from 'lucide-react';
+import GlitchText from './GlitchText';
 
 export default function Bio() {
   return (
@@ -8,7 +9,11 @@ export default function Bio() {
       <div className="max-w-4xl mx-auto">
         <RetroFrame>
           <div className="text-center mb-8">
-            <h2 className="font-vt323 text-4xl text-neon-cyan mb-4 tracking-widest glow-text-cyan">OPERATOR PROFILE</h2>
+            <h2 className="font-vt323 text-4xl text-neon-cyan mb-4 tracking-widest glow-text-cyan">
+              <GlitchText disabled>
+                OPERATOR PROFILE
+              </GlitchText>
+            </h2>
             <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent"></div>
           </div>
           

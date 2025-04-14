@@ -4,6 +4,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 export default function RetroAudio() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
+  const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   useEffect(() => {
@@ -11,7 +12,7 @@ export default function RetroAudio() {
     const audioElement = new Audio();
     audioElement.loop = true;
     audioElement.volume = volume;
-    audioElement.src = 'https://cdn.freesound.org/previews/647/647748_5674468-lq.mp3'; // Retro synth ambient sound
+    audioElement.src = 'https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3'; // Alternative retro sound
     audioRef.current = audioElement;
     
     // Clean up on unmount
@@ -39,6 +40,7 @@ export default function RetroAudio() {
         if (playPromise !== undefined) {
           playPromise.catch(error => {
             console.error("Audio playback was prevented:", error);
+            setError("Audio playback failed. Please try again.");
             setIsPlaying(false);
           });
         }
@@ -49,6 +51,13 @@ export default function RetroAudio() {
   }, [isPlaying]);
   
   const togglePlay = () => {
+    if (error) {
+      setError(null);
+      // Try to reload the audio
+      if (audioRef.current) {
+        audioRef.current.load();
+      }
+    }
     setIsPlaying(prev => !prev);
   };
   
@@ -67,7 +76,13 @@ export default function RetroAudio() {
         {isPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
       </button>
       
-      {isPlaying && (
+      {error && (
+        <span className="text-neon-pink font-vt323 text-xs">
+          {error}
+        </span>
+      )}
+      
+      {isPlaying && !error && (
         <div className="flex items-center space-x-2">
           <span className="text-neon-cyan font-vt323 text-xs animate-pulse">SYNTH.FM</span>
           <input

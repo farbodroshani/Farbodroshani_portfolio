@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, Menu, X, Instagram, Home } from 'lucide-react';
+import { Github, Linkedin, Mail, Menu, X, Instagram } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import GlitchText from './GlitchText';
@@ -18,15 +18,10 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               whileHover={{ scale: 1.05, textShadow: "0 0 15px #00ffff" }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="font-vt323 text-2xl text-neon-cyan tracking-widest glow-text-cyan cursor-pointer flex items-center gap-2"
+              className="font-vt323 text-2xl text-neon-cyan tracking-widest glow-text-cyan cursor-pointer"
             >
-              <Home size={20} className="inline-block text-neon-cyan" />
-              <GlitchText 
-                intensity="subtle" 
-                triggerProbability={0.2} 
-                triggerInterval={8000}
-              >
-                DRAGON::COMMAND
+              <GlitchText intensity="medium" triggerProbability={0.3} triggerInterval={6000}>
+                DRAGON::TERMINAL
               </GlitchText>
             </motion.div>
           </Link>
@@ -111,7 +106,7 @@ function SocialLinks() {
         <Linkedin size={20} />
       </a>
       <a
-        href="mailto:farbodroshanii@gmail.com"
+        href="mailto:farbodroshani@gmail.com"
         className="text-neon-cyan hover:text-neon-pink transition-colors social-icon"
       >
         <Mail size={20} />

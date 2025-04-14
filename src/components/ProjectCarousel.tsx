@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import RetroFrame from './RetroFrame';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import GlitchText from './GlitchText';
 
 // Project data
 const projects = [
@@ -78,7 +79,11 @@ export default function ProjectCarousel() {
       <div className="max-w-4xl mx-auto">
         <RetroFrame variant="dark">
           <div className="text-center mb-8">
-            <h2 className="font-vt323 text-4xl text-neon-cyan mb-4 tracking-widest glow-text-cyan">PROJECT ARCHIVE</h2>
+            <h2 className="font-vt323 text-4xl text-neon-cyan mb-4 tracking-widest glow-text-cyan">
+              <GlitchText disabled>
+                PROJECT ARCHIVE
+              </GlitchText>
+            </h2>
             <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent"></div>
           </div>
           

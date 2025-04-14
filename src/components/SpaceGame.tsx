@@ -1,5 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import GlitchText from './GlitchText';
 import RetroFrame from './RetroFrame';
+
+interface Enemy {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  health: number;
+  speed: number;
+}
+
+interface Bullet {
+  x: number;
+  y: number;
+}
 
 export default function SpaceGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -9,27 +25,25 @@ export default function SpaceGame() {
   const [gameOver, setGameOver] = useState(false);
   const gameStateRef = useRef({
     player: { x: 0, y: 0, width: 30, height: 30, speed: 5 },
-    bullets: [] as { x: number; y: number }[],
-    enemies: [] as { x: number; y: number; width: number; height: number; health: number; speed: number }[],
+    bullets: [] as Bullet[],
+    enemies: [] as Enemy[],
     mousePosition: { x: 0, y: 0 },
     lightningEffect: { active: false, duration: 0, x: 0, y: 0 }
   });
 
-  // Drawing functions outside of the effect for better performance
-  const drawLightning = useCallback((ctx: CanvasRenderingContext2D, x: number, y: number) => {
+  const drawLightning = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
     const gameState = gameStateRef.current;
     gameState.lightningEffect.active = true;
     gameState.lightningEffect.duration = 10;
     gameState.lightningEffect.x = x;
     gameState.lightningEffect.y = y;
     
-    // Play lightning sound
     const audio = new Audio('https://www.myinstants.com/media/sounds/thunder.mp3');
     audio.volume = 0.2;
     audio.play();
-  }, []);
+  };
 
-  const drawLaserBeam = useCallback((ctx: CanvasRenderingContext2D) => {
+  const drawLaserBeam = (ctx: CanvasRenderingContext2D) => {
     const { player, mousePosition } = gameStateRef.current;
     
     const gradient = ctx.createLinearGradient(
@@ -46,7 +60,6 @@ export default function SpaceGame() {
     ctx.beginPath();
     ctx.moveTo(player.x + player.width / 2, player.y);
     
-    // Create zig-zag pattern for laser
     const segments = 5;
     const offsetMax = 10;
     
@@ -55,7 +68,6 @@ export default function SpaceGame() {
       const x = player.x + player.width / 2 + (mousePosition.x - player.x - player.width / 2) * ratio;
       const y = player.y + (mousePosition.y - player.y) * ratio;
       
-      // Add random offset for zigzag effect (less random for performance)
       const offset = (Math.random() * offsetMax) - (offsetMax / 2);
       
       ctx.lineTo(x + offset, y);
@@ -66,33 +78,28 @@ export default function SpaceGame() {
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    // Add glow effect
     ctx.shadowColor = '#00ffff';
     ctx.shadowBlur = 10;
     ctx.stroke();
     ctx.shadowBlur = 0;
-  }, []);
+  };
 
-  // Game logic separated for better performance
-  const updateGameState = useCallback(() => {
+  const updateGameState = () => {
     const gameState = gameStateRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return true;
 
-    // Move player towards mouse X position
     if (gameState.mousePosition.x > gameState.player.x + gameState.player.width / 2 + 5) {
       gameState.player.x += gameState.player.speed;
     } else if (gameState.mousePosition.x < gameState.player.x + gameState.player.width / 2 - 5) {
       gameState.player.x -= gameState.player.speed;
     }
 
-    // Keep player within canvas bounds
     if (gameState.player.x < 0) gameState.player.x = 0;
     if (gameState.player.x > canvas.width - gameState.player.width) {
       gameState.player.x = canvas.width - gameState.player.width;
     }
 
-    // Update bullets
     for (let i = gameState.bullets.length - 1; i >= 0; i--) {
       const bullet = gameState.bullets[i];
       bullet.y -= 10;
@@ -102,8 +109,7 @@ export default function SpaceGame() {
       }
     }
 
-    // Spawn enemies
-    const spawnRate = 0.03; // Fixed spawn rate
+    const spawnRate = 0.03;
     if (Math.random() < spawnRate && gameState.enemies.length < 5) {
       const enemyWidth = 40 + Math.floor(Math.random() * 20);
       const enemyHeight = 30 + Math.floor(Math.random() * 15);
@@ -118,12 +124,10 @@ export default function SpaceGame() {
       });
     }
 
-    // Update enemies
     for (let i = gameState.enemies.length - 1; i >= 0; i--) {
       const enemy = gameState.enemies[i];
       enemy.y += enemy.speed;
 
-      // Check collision with bullets
       let enemyHit = false;
       for (let j = gameState.bullets.length - 1; j >= 0; j--) {
         const bullet = gameState.bullets[j];
@@ -151,7 +155,6 @@ export default function SpaceGame() {
 
       if (enemyHit) continue;
 
-      // Check collision with player
       if (enemy.y + enemy.height > gameState.player.y &&
           enemy.x < gameState.player.x + gameState.player.width &&
           enemy.x + enemy.width > gameState.player.x &&
@@ -169,9 +172,9 @@ export default function SpaceGame() {
     }
     
     return true;
-  }, [score, drawLightning]);
+  };
 
-  const renderGame = useCallback(() => {
+  const renderGame = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -180,15 +183,12 @@ export default function SpaceGame() {
     
     const gameState = gameStateRef.current;
 
-    // Use solid black background
-    ctx.fillStyle = '#080010'; // solid black
+    ctx.fillStyle = '#080010';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw grid lines (Blood Dragon style)
     ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
     ctx.lineWidth = 1;
     
-    // Horizontal grid lines
     for (let i = 0; i < canvas.height; i += 40) {
       ctx.beginPath();
       ctx.moveTo(0, i);
@@ -196,7 +196,6 @@ export default function SpaceGame() {
       ctx.stroke();
     }
     
-    // Lightning effect if active
     if (gameState.lightningEffect.active) {
       ctx.fillStyle = 'rgba(255, 0, 255, 0.2)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -207,20 +206,17 @@ export default function SpaceGame() {
       }
     }
 
-    // Draw player with neon glow
     ctx.shadowColor = '#ff00ff';
     ctx.shadowBlur = 10;
     ctx.fillStyle = '#ff0050';
     ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
     ctx.shadowBlur = 0;
     
-    // Draw dragon eye
     ctx.fillStyle = '#ffff00';
     ctx.beginPath();
     ctx.arc(gameState.player.x + gameState.player.width / 2, gameState.player.y + 10, 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw bullets
     for (const bullet of gameState.bullets) {
       ctx.shadowColor = '#00ffff';
       ctx.shadowBlur = 10;
@@ -229,7 +225,6 @@ export default function SpaceGame() {
       ctx.shadowBlur = 0;
     }
 
-    // Draw enemies
     for (const enemy of gameState.enemies) {
       ctx.shadowColor = '#ff00ff';
       ctx.shadowBlur = 10;
@@ -237,7 +232,6 @@ export default function SpaceGame() {
       ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
       ctx.shadowBlur = 0;
       
-      // Add dragon eyes
       ctx.fillStyle = '#ff5500';
       ctx.beginPath();
       ctx.arc(enemy.x + 10, enemy.y + 10, 5, 0, Math.PI * 2);
@@ -247,14 +241,13 @@ export default function SpaceGame() {
       ctx.fill();
     }
 
-    // Add fog effect
     const fogGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    fogGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)'); // More transparent at top
-    fogGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.2)'); // Slightly more fog in middle
-    fogGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)'); // More fog at bottom but still transparent
+    fogGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+    fogGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.2)');
+    fogGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
     ctx.fillStyle = fogGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }, []);
+  };
   
   useEffect(() => {
     if (!gameStarted) return;
@@ -265,7 +258,6 @@ export default function SpaceGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Initialize game state
     gameStateRef.current = {
       player: {
         x: canvas.width / 2,
@@ -280,30 +272,41 @@ export default function SpaceGame() {
       lightningEffect: { active: false, duration: 0, x: 0, y: 0 }
     };
 
-    // Event listeners for mouse movement
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       gameStateRef.current.mousePosition.x = e.clientX - rect.left;
       gameStateRef.current.mousePosition.y = e.clientY - rect.top;
     };
 
-    // Event listener for mouse click (shooting)
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
+      gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
+    };
+
     const handleMouseClick = () => {
       gameStateRef.current.bullets.push({
         x: gameStateRef.current.player.x + gameStateRef.current.player.width / 2,
         y: gameStateRef.current.player.y
       });
       
-      // Play sound effect
       const audio = new Audio('https://www.myinstants.com/media/sounds/laser.mp3');
       audio.volume = 0.2;
       audio.play();
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('click', handleMouseClick);
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      handleMouseClick();
+    };
 
-    // Game loop
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('click', handleMouseClick);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+
     let animationId: number;
     let lastTime = 0;
     const fps = 60;
@@ -312,7 +315,6 @@ export default function SpaceGame() {
     const gameLoop = (timestamp: number) => {
       if (!gameStarted) return;
       
-      // Throttle frame rate for better performance
       const elapsed = timestamp - lastTime;
       if (elapsed < frameTime) {
         animationId = requestAnimationFrame(gameLoop);
@@ -320,26 +322,24 @@ export default function SpaceGame() {
       }
       lastTime = timestamp - (elapsed % frameTime);
       
-      // Update game state
       const gameRunning = updateGameState();
       if (!gameRunning) return;
       
-      // Render the game
       renderGame();
       
       animationId = requestAnimationFrame(gameLoop);
     };
 
-    // Start game loop
     animationId = requestAnimationFrame(gameLoop);
 
-    // Cleanup
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('click', handleMouseClick);
+      canvas.removeEventListener('touchstart', handleTouchStart);
       cancelAnimationFrame(animationId);
     };
-  }, [gameStarted, drawLaserBeam, updateGameState, renderGame]);
+  }, [gameStarted]);
 
   const startGame = () => {
     setGameStarted(true);
@@ -370,17 +370,16 @@ export default function SpaceGame() {
               ref={canvasRef}
               width={600}
               height={400}
-              className="absolute top-0 left-0 w-full h-full cursor-crosshair"
+              className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"
               style={{ backgroundColor: '#080010' }}
             />
             <div className="absolute inset-0 pointer-events-none scanline"></div>
           </div>
           
           <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
-            MOVE: MOUSE | FIRE: CLICK
+            MOVE: {window.innerWidth <= 768 ? 'TOUCH' : 'MOUSE'} | FIRE: {window.innerWidth <= 768 ? 'TAP' : 'CLICK'}
           </div>
           
-          {/* Fanbase of Bombardiro Crocodilo! */}
           <div className="mt-10 relative overflow-hidden">
             <div className="text-center">
               <h3 className="font-vt323 text-2xl text-neon-pink mb-4 tracking-widest glow-text-pink">
