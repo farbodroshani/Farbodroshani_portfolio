@@ -72,7 +72,7 @@ function NavLinks() {
           DIMENSION_01
         </GlitchText>
       </Link>
-      <Link to="/projects" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">ARTIFACTS</Link>
+      <Link to="/artifacts" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">ARTIFACTS</Link>
       <Link to="/game" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">DRAGON_COMBAT</Link>
     </>
   );
@@ -106,7 +106,7 @@ function SocialLinks() {
         <Linkedin size={20} />
       </a>
       <a
-        href="mailto:farbodroshani@gmail.com"
+        href="mailto:farbodroshanii@gmail.com"
         className="text-neon-cyan hover:text-neon-pink transition-colors social-icon"
       >
         <Mail size={20} />

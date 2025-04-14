@@ -6,9 +6,11 @@ import SpaceGame from './components/SpaceGame';
 import Bio from './components/Bio';
 import Terminal from './components/Terminal';
 import ProjectCarousel from './components/ProjectCarousel';
-import RetroAudio from './components/RetroAudio';
 import LoadingScreen from './components/LoadingScreen';
 import EffectsProvider from './components/EffectsProvider';
+import Footer from './components/Footer';
+import Artifacts from './components/Artifacts';
+import NeonRain from './components/NeonRain';
 import './styles/effects.css';
 import '@fontsource/bodoni-moda/700';
 import '@fontsource/inter/400';
@@ -53,29 +55,6 @@ function DimensionPage() {
         
         {/* Terminal component */}
         <Terminal />
-      </div>
-    </div>
-  );
-}
-
-// Artifacts page content
-function ArtifactsPage() {
-  return (
-    <div className="min-h-screen pt-24">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="font-vt323 text-5xl md:text-6xl text-center mb-8 text-neon-pink glow-text-pink">
-          <GlitchText intensity="medium" triggerProbability={0.25} triggerInterval={5000}>
-            ARTIFACTS
-          </GlitchText>
-        </h1>
-        <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-12"></div>
-        
-        {/* Project component with dedicated layout */}
-        <div className="retro-container">
-          <div className="retro-scanlines"></div>
-          <div className="retro-glow"></div>
-          <ProjectCarousel />
-        </div>
       </div>
     </div>
   );
@@ -132,6 +111,9 @@ function App() {
         case '/game':
           text = "LOADING DRAGON_COMBAT";
           break;
+        case '/artifacts':
+          text = "ACCESSING ARTIFACT VAULT";
+          break;
         default:
           text = "SYSTEM BOOTING";
       }
@@ -152,172 +134,177 @@ function App() {
 
   return (
     <EffectsProvider>
-      <div className="bg-cyberpunk-black min-h-screen text-white">
-        {/* Floating Cyberpunk Symbols */}
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            top: '20%',
-            left: '10%',
-            fontSize: '24px',
-            color: '#00FFFF',
-            filter: 'drop-shadow(0 0 10px rgba(0, 255, 255, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatLeft 15s linear infinite'
-          }}
-        >
-          <span>Δ</span>
-        </div>
-        
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            bottom: '25%',
-            right: '15%',
-            fontSize: '24px',
-            color: '#FF00FF',
-            filter: 'drop-shadow(0 0 10px rgba(255, 0, 255, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatRight 20s linear infinite'
-          }}
-        >
-          <span>Ψ</span>
-        </div>
-        
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            top: '50%',
-            left: '5%',
-            fontSize: '24px',
-            color: '#B76E79',
-            filter: 'drop-shadow(0 0 10px rgba(183, 110, 121, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatUp 25s linear infinite'
-          }}
-        >
-          <span>Ω</span>
-        </div>
-        
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            bottom: '10%',
-            left: '20%',
-            fontSize: '24px',
-            color: '#ff00ff',
-            filter: 'drop-shadow(0 0 10px rgba(255, 0, 255, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatDiagonal 30s linear infinite'
-          }}
-        >
-          <span>Ξ</span>
-        </div>
-
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            top: '30%',
-            right: '20%',
-            fontSize: '24px',
-            color: '#00FF00',
-            filter: 'drop-shadow(0 0 10px rgba(0, 255, 0, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatDiagonalReverse 22s linear infinite'
-          }}
-        >
-          <span>Λ</span>
-        </div>
-
-        <div 
-          style={{
-            position: 'fixed',
-            zIndex: 9999,
-            bottom: '15%',
-            left: '30%',
-            fontSize: '24px',
-            color: '#FFFF00',
-            filter: 'drop-shadow(0 0 10px rgba(255, 255, 0, 0.9))',
-            pointerEvents: 'none',
-            animation: 'floatLeft 18s linear infinite'
-          }}
-        >
-          <span>Φ</span>
-        </div>
-
-        {/* Film grain effect */}
-        <div className="grain animate-grain" />
-        
-        {/* Scanline effect */}
-        <div className="scanline animate-scanline" />
-        
-        {/* Grid lines effect */}
-        <div className="grid-lines" />
-        
-        {/* Lightning effects */}
-        <div className="lightning-effect lightning-left" />
-        <div className="lightning-effect lightning-right" />
-        
-        {/* Audio controls */}
-        <RetroAudio />
-        
-        {/* Navigation */}
-        <Navbar />
-        
-        {/* Floating Home Button - Only visible when not on homepage */}
-        {!isHomePage && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 500, 
-              damping: 30,
-              delay: 0.5 
+      <div className="bg-cyberpunk-black min-h-screen text-white flex flex-col">
+        {/* Background effects and floating symbols */}
+        <div className="fixed inset-0 pointer-events-none">
+          {/* Floating Cyberpunk Symbols */}
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              top: '20%',
+              left: '10%',
+              fontSize: '24px',
+              color: '#00FFFF',
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 255, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatLeft 15s linear infinite'
             }}
-            className="fixed bottom-4 right-4 z-40"
           >
-            <Link 
-              to="/" 
-              className="flex items-center justify-center w-12 h-12 rounded-full bg-cyberpunk-black border-2 border-neon-pink shadow-lg hover:bg-neon-pink transition-all duration-300 group"
-              aria-label="Return to home"
+            <span>Δ</span>
+          </div>
+          
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              bottom: '25%',
+              right: '15%',
+              fontSize: '24px',
+              color: '#FF00FF',
+              filter: 'drop-shadow(0 0 10px rgba(255, 0, 255, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatRight 20s linear infinite'
+            }}
+          >
+            <span>Ψ</span>
+          </div>
+          
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              top: '50%',
+              left: '5%',
+              fontSize: '24px',
+              color: '#B76E79',
+              filter: 'drop-shadow(0 0 10px rgba(183, 110, 121, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatUp 25s linear infinite'
+            }}
+          >
+            <span>Ω</span>
+          </div>
+          
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              bottom: '10%',
+              left: '20%',
+              fontSize: '24px',
+              color: '#ff00ff',
+              filter: 'drop-shadow(0 0 10px rgba(255, 0, 255, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatDiagonal 30s linear infinite'
+            }}
+          >
+            <span>Ξ</span>
+          </div>
+
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              top: '30%',
+              right: '20%',
+              fontSize: '24px',
+              color: '#00FF00',
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 0, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatDiagonalReverse 22s linear infinite'
+            }}
+          >
+            <span>Λ</span>
+          </div>
+
+          <div 
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+              bottom: '15%',
+              left: '30%',
+              fontSize: '24px',
+              color: '#FFFF00',
+              filter: 'drop-shadow(0 0 10px rgba(255, 255, 0, 0.9))',
+              pointerEvents: 'none',
+              animation: 'floatLeft 18s linear infinite'
+            }}
+          >
+            <span>Φ</span>
+          </div>
+
+          {/* Visual effects */}
+          <div className="grain animate-grain" />
+          <div className="scanline animate-scanline" />
+          <div className="grid-lines" />
+          <div className="lightning-effect lightning-left" />
+          <div className="lightning-effect lightning-right" />
+        </div>
+
+        {/* Main content wrapper */}
+        <div className="flex flex-col min-h-screen">
+          {/* Navigation */}
+          <Navbar />
+          
+          {/* Floating Home Button */}
+          {!isHomePage && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 500, 
+                damping: 30,
+                delay: 0.5 
+              }}
+              className="fixed bottom-4 right-4 z-40"
             >
-              <Home 
-                size={24} 
-                className="text-neon-cyan group-hover:text-cyberpunk-black transition-colors" 
+              <Link 
+                to="/" 
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-cyberpunk-black border-2 border-neon-pink shadow-lg hover:bg-neon-pink transition-all duration-300 group"
+                aria-label="Return to home"
+              >
+                <Home 
+                  size={24} 
+                  className="text-neon-cyan group-hover:text-cyberpunk-black transition-colors" 
+                />
+              </Link>
+            </motion.div>
+          )}
+          
+          {/* Loading Screen */}
+          <AnimatePresence>
+            {isLoading && (
+              <LoadingScreen
+                onLoadingComplete={handleLoadingComplete}
+                loadingText={loadingText}
               />
-            </Link>
-          </motion.div>
-        )}
-        
-        {/* Loading Screen */}
-        <AnimatePresence>
-          {isLoading && (
-            <LoadingScreen
-              onLoadingComplete={handleLoadingComplete}
-              loadingText={loadingText}
-            />
-          )}
-        </AnimatePresence>
-        
-        {/* Main content with routes */}
-        <AnimatePresence mode="wait">
-          {!isLoading && (
-            <main className="relative">
-              <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/dimension" element={<DimensionPage />} />
-                <Route path="/projects" element={<ArtifactsPage />} />
-                <Route path="/game" element={<DragonCombatPage />} />
-              </Routes>
-            </main>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
+          
+          {/* Main content with routes */}
+          <AnimatePresence mode="wait">
+            {!isLoading && (
+              <main className="flex-grow">
+                <Routes location={location} key={location.pathname}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/dimension" element={<DimensionPage />} />
+                  <Route path="/projects" element={<ProjectCarousel />} />
+                  <Route path="/terminal" element={<Terminal />} />
+                  <Route path="/game" element={<DragonCombatPage />} />
+                  <Route path="/artifacts" element={<Artifacts />} />
+                </Routes>
+              </main>
+            )}
+          </AnimatePresence>
+
+          {/* Footer */}
+          <Footer />
+        </div>
+
+        {/* Neon Rain Effect */}
+        <NeonRain />
       </div>
     </EffectsProvider>
   );
