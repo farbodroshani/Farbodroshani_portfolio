@@ -31,8 +31,8 @@ export default function Artifacts() {
         'terriblefacebookmemes'
       ];
       
-      // First choose between tech and regular (50-50 chance)
-      const isTech = Math.random() < 0.5;
+      // First choose between tech and regular (60% regular, 40% tech)
+      const isTech = Math.random() < 0.4;
       const selectedSubreddits = isTech ? techSubreddits : regularSubreddits;
       
       // Then randomly select from the chosen category
