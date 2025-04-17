@@ -6,18 +6,54 @@ import { useState, useEffect } from 'react';
 export default function Artifacts() {
   const [meme, setMeme] = useState<{ url: string; title: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRandomMeme = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await fetch('https://meme-api.com/gimme');
+      // Separate tech and regular meme subreddits
+      const techSubreddits = [
+        'ProgrammerHumor',
+        'codingmemes',
+        'techhumor',
+        'linuxmemes',
+        'programmingmemes',
+        'softwaregore'
+      ];
+
+      const regularSubreddits = [
+        'memes',
+        'dankmemes',
+        'me_irl',
+        'funny',
+        'comedyheaven',
+        'terriblefacebookmemes'
+      ];
+      
+      // First choose between tech and regular (50-50 chance)
+      const isTech = Math.random() < 0.5;
+      const selectedSubreddits = isTech ? techSubreddits : regularSubreddits;
+      
+      // Then randomly select from the chosen category
+      const randomSubreddit = selectedSubreddits[Math.floor(Math.random() * selectedSubreddits.length)];
+      const response = await fetch(`https://meme-api.com/gimme/${randomSubreddit}`);
       const data = await response.json();
+      
+      // Only filter out extremely sensitive content
+      if (data.nsfw && data.over_18) {
+        throw new Error('Content filtered out');
+      }
+
       setMeme({
         url: data.url,
         title: data.title
       });
     } catch (error) {
       console.error('Error fetching meme:', error);
+      setError('Failed to load meme. Trying again...');
+      // Retry after a short delay
+      setTimeout(fetchRandomMeme, 1000);
     } finally {
       setLoading(false);
     }
@@ -97,6 +133,11 @@ export default function Artifacts() {
                 <p className="text-neon-cyan/80 font-vt323 text-sm mb-4">
                   * These memes are generated from an external API and are not my own creations
                 </p>
+                {error && (
+                  <p className="text-neon-pink font-vt323 text-sm mb-4">
+                    {error}
+                  </p>
+                )}
                 {loading ? (
                   <div className="flex flex-col items-center">
                     <div className="flex justify-center space-x-2 mb-4">

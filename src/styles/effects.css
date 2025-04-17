@@ -974,9 +974,23 @@
 
 .custom-game-backdrop {
   position: relative;
-  z-index: 1;
-  background-color: rgba(10, 10, 30, 0.3);
-  backdrop-filter: blur(3px);
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: rgba(8, 0, 16, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .custom-game-backdrop {
+    margin: 1rem auto;
+    padding: 0.5rem;
+    max-width: 100%;
+    min-height: 400px;
+  }
 }
 
 /* Terminal styles */
