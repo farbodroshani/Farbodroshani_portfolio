@@ -7,6 +7,14 @@ import GlitchText from './GlitchText';
 // Project data
 const projects = [
   {
+    title: "Cosmic Fortune",
+    description: "Interactive fortune-telling experience",
+    details: "A mystical web application that provides cosmic insights and fortune readings. Built with modern web technologies and featuring an engaging user interface.",
+    imageUrl: "https://cosmicfortune.netlify.app/",
+    year: "2025",
+    link: "https://cosmicfortune.netlify.app/"
+  },
+  {
     title: "Quantum Chat",
     description: "Real-time messaging app with end-to-end encryption",
     details: "Built with React, Firebase, and WebRTC. Features include video calls, file sharing, and disappearing messages.",
