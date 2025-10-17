@@ -302,8 +302,10 @@ export default function SpaceGame() {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const touch = e.touches[0];
-      gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
-      gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
+      if (touch) {
+        gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
+        gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
+      }
     };
 
     const handleMouseClick = useCallback(() => {
@@ -322,13 +324,26 @@ export default function SpaceGame() {
 
     const handleTouchStart = (e: TouchEvent) => {
       e.preventDefault();
-      handleMouseClick();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
+        gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
+        handleMouseClick();
+      }
     };
 
+    // Add event listeners with proper options for mobile
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('click', handleMouseClick);
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    
+    // Additional mobile-specific events
+    if (isMobile) {
+      canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
+      canvas.addEventListener('touchcancel', (e) => e.preventDefault(), { passive: false });
+    }
 
     let animationId: number;
     let lastTime = 0;
@@ -361,6 +376,13 @@ export default function SpaceGame() {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('click', handleMouseClick);
       canvas.removeEventListener('touchstart', handleTouchStart);
+      
+      // Remove mobile-specific event listeners
+      if (isMobile) {
+        canvas.removeEventListener('touchend', (e) => e.preventDefault());
+        canvas.removeEventListener('touchcancel', (e) => e.preventDefault());
+      }
+      
       cancelAnimationFrame(animationId);
     };
   }, [gameStarted]);
@@ -395,7 +417,11 @@ export default function SpaceGame() {
               width={isMobile ? 400 : 600}
               height={isMobile ? 300 : 400}
               className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"
-              style={{ backgroundColor: '#080010' }}
+              style={{ 
+                backgroundColor: '#080010',
+                touchAction: 'none',
+                userSelect: 'none'
+              }}
             />
             <div className="absolute inset-0 pointer-events-none scanline"></div>
             {performanceMode && (
@@ -406,8 +432,16 @@ export default function SpaceGame() {
           </div>
           
           <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
-            MOVE: {window.innerWidth <= 768 ? 'TOUCH' : 'MOUSE'} | FIRE: {window.innerWidth <= 768 ? 'TAP' : 'CLICK'}
+            MOVE: {isMobile ? 'TOUCH' : 'MOUSE'} | FIRE: {isMobile ? 'TAP' : 'CLICK'}
           </div>
+          
+          {isMobile && (
+            <div className="mt-4 p-4 bg-cyberpunk-black/50 border border-neon-cyan/30 rounded-lg">
+              <p className="font-vt323 text-neon-cyan text-sm text-center">
+                💡 TIP: Touch and drag to move, tap to shoot!
+              </p>
+            </div>
+          )}
           
           <div className="mt-10 relative overflow-hidden">
             <div className="text-center">
