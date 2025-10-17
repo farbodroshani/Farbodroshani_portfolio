@@ -53,6 +53,20 @@ export default function SpaceGame() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Initialize canvas when component mounts
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Set initial background
+        ctx.fillStyle = '#080010';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        console.log('Canvas initialized with dimensions:', canvas.width, 'x', canvas.height);
+      }
+    }
+  }, []);
+
   const drawLightning = useCallback((x: number, y: number) => {
     const gameState = gameStateRef.current;
     gameState.lightningEffect.active = true;
@@ -175,12 +189,19 @@ export default function SpaceGame() {
 
   const renderGame = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('Canvas not found');
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('Canvas context not found');
+      return;
+    }
     
     const gameState = gameStateRef.current;
+    console.log('Rendering game, player at:', gameState.player.x, gameState.player.y);
 
     // Clear canvas
     ctx.fillStyle = '#080010';
@@ -352,7 +373,10 @@ export default function SpaceGame() {
     const frameTime = 1000 / fps;
     
     const gameLoop = (timestamp: number) => {
-      if (!gameStarted) return;
+      if (!gameStarted) {
+        console.log('Game not started, stopping loop');
+        return;
+      }
       
       const elapsed = timestamp - lastTime;
       if (elapsed < frameTime) {
@@ -362,7 +386,10 @@ export default function SpaceGame() {
       lastTime = timestamp - (elapsed % frameTime);
       
       const gameRunning = updateGameState();
-      if (!gameRunning) return;
+      if (!gameRunning) {
+        console.log('Game stopped, ending loop');
+        return;
+      }
       
       renderGame();
       
@@ -421,7 +448,8 @@ export default function SpaceGame() {
               style={{ 
                 backgroundColor: '#080010',
                 touchAction: 'none',
-                userSelect: 'none'
+                userSelect: 'none',
+                display: 'block'
               }}
             />
             <div className="absolute inset-0 pointer-events-none scanline"></div>
