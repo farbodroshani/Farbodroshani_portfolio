@@ -394,10 +394,10 @@ export default function SpaceGame() {
   };
 
   return (
-    <div className={`${isMobile ? 'py-8' : 'min-h-screen pt-20'} px-4 relative`}>
-      <RetroFrame className="max-w-2xl mx-auto" variant="dark">
+    <div className={`${isMobile ? 'py-4' : 'min-h-screen pt-20'} px-4 relative`}>
+      <RetroFrame className={`${isMobile ? 'max-w-sm' : 'max-w-2xl'} mx-auto`} variant="dark">
         <div className="text-center">
-          <p className="font-vt323 text-xl text-pink-500 mb-4">
+          <p className={`font-vt323 text-pink-500 mb-4 ${isMobile ? 'text-lg' : 'text-xl'}`}>
             SCORE: <span className="text-cyan-400">{score}</span> | 
             HI-SCORE: <span className="text-cyan-400">{highScore}</span>
           </p>
@@ -411,11 +411,11 @@ export default function SpaceGame() {
             </button>
           ) : null}
           
-          <div className={`relative w-full mx-auto ${isMobile ? 'max-w-[350px] aspect-[4/3]' : 'max-w-[600px] aspect-[3/2]'}`}>
+          <div className={`relative w-full mx-auto ${isMobile ? 'max-w-[300px] aspect-[4/3]' : 'max-w-[600px] aspect-[3/2]'}`}>
             <canvas
               ref={canvasRef}
-              width={isMobile ? 350 : 600}
-              height={isMobile ? 260 : 400}
+              width={isMobile ? 300 : 600}
+              height={isMobile ? 225 : 400}
               className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"
               style={{ 
                 backgroundColor: '#080010',
@@ -443,13 +443,14 @@ export default function SpaceGame() {
             </div>
           )}
           
-          <div className={`${isMobile ? 'mt-6' : 'mt-10'} relative overflow-hidden`}>
-            <div className="text-center">
-              <h3 className={`font-vt323 text-neon-pink mb-4 tracking-widest glow-text-pink ${isMobile ? 'text-xl' : 'text-2xl'}`}>
-                TECHNICAL EXPERTISE
-              </h3>
-              <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-6"></div>
-            </div>
+          {!isMobile && (
+            <div className="mt-10 relative overflow-hidden">
+              <div className="text-center">
+                <h3 className="font-vt323 text-2xl text-neon-pink mb-4 tracking-widest glow-text-pink">
+                  TECHNICAL EXPERTISE
+                </h3>
+                <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-6"></div>
+              </div>
             
             <div className={`bg-cyberpunk-black/40 border-2 border-neon-cyan glow-border-cyan rounded-lg relative ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="absolute -right-8 -top-8 w-24 h-24 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full blur-xl opacity-30"></div>
@@ -475,6 +476,7 @@ export default function SpaceGame() {
               <div className="scanline absolute inset-0 pointer-events-none"></div>
             </div>
           </div>
+          )}
         </div>
       </RetroFrame>
     </div>
