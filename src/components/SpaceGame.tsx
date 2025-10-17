@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import RetroFrame from './RetroFrame';
 
-interface Enemy {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  health: number;
-  speed: number;
-}
-
-interface Bullet {
+interface Position {
   x: number;
   y: number;
 }
@@ -22,17 +13,17 @@ export default function SpaceGame() {
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [performanceMode, setPerformanceMode] = useState(false);
   
   const gameStateRef = useRef({
-    player: { x: 0, y: 0, width: 30, height: 30, speed: 5 },
-    bullets: [] as Bullet[],
-    enemies: [] as Enemy[],
-    mousePosition: { x: 0, y: 0 },
-    lightningEffect: { active: false, duration: 0, x: 0, y: 0 }
+    snake: [{ x: 10, y: 10 }] as Position[],
+    food: { x: 15, y: 15 } as Position,
+    direction: { x: 0, y: 0 } as Position,
+    nextDirection: { x: 0, y: 0 } as Position,
+    gridSize: 20,
+    gameSpeed: 150
   });
 
-  // Detect mobile device and set performance mode
+  // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
       const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -41,11 +32,6 @@ export default function SpaceGame() {
       
       const isMobileDevice = mobile || (touchDevice && smallScreen);
       setIsMobile(isMobileDevice);
-      
-      // Enable performance mode for mobile or low-end devices
-      if (isMobileDevice || navigator.hardwareConcurrency <= 2) {
-        setPerformanceMode(true);
-      }
     };
     
     checkMobile();
@@ -53,126 +39,74 @@ export default function SpaceGame() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-
-  const drawLightning = useCallback((x: number, y: number) => {
-    const gameState = gameStateRef.current;
-    gameState.lightningEffect.active = true;
-    gameState.lightningEffect.duration = performanceMode ? 5 : 10; // Shorter effect on mobile
-    gameState.lightningEffect.x = x;
-    gameState.lightningEffect.y = y;
+  const generateFood = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    // Only play audio if not in performance mode
-    if (!performanceMode) {
-      const audio = new Audio('https://www.myinstants.com/media/sounds/thunder.mp3');
-      audio.volume = 0.1;
-      audio.play().catch(() => {}); // Ignore audio errors
-    }
-  }, [performanceMode]);
-
+    const gridSize = gameStateRef.current.gridSize;
+    const maxX = Math.floor(canvas.width / gridSize) - 1;
+    const maxY = Math.floor(canvas.height / gridSize) - 1;
+    
+    let newFood;
+    do {
+      newFood = {
+        x: Math.floor(Math.random() * maxX),
+        y: Math.floor(Math.random() * maxY)
+      };
+    } while (gameStateRef.current.snake.some(segment => 
+      segment.x === newFood.x && segment.y === newFood.y
+    ));
+    
+    gameStateRef.current.food = newFood;
+  }, []);
 
   const updateGameState = useCallback(() => {
     const gameState = gameStateRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return true;
 
-    // Optimized player movement with reduced calculations
-    const playerCenter = gameState.player.x + gameState.player.width / 2;
-    const mouseX = gameState.mousePosition.x;
-    const threshold = performanceMode ? 10 : 5; // Larger threshold for mobile
-    
-    if (mouseX > playerCenter + threshold) {
-      gameState.player.x += gameState.player.speed;
-    } else if (mouseX < playerCenter - threshold) {
-      gameState.player.x -= gameState.player.speed;
+    // Update direction
+    gameState.direction = { ...gameState.nextDirection };
+
+    // Move snake head
+    const head = { ...gameState.snake[0] };
+    head.x += gameState.direction.x;
+    head.y += gameState.direction.y;
+
+    // Check wall collision
+    const gridSize = gameState.gridSize;
+    const maxX = Math.floor(canvas.width / gridSize) - 1;
+    const maxY = Math.floor(canvas.height / gridSize) - 1;
+
+    if (head.x < 0 || head.x > maxX || head.y < 0 || head.y > maxY) {
+      setHighScore(prev => Math.max(prev, score));
+      setGameOver(true);
+      setGameStarted(false);
+      return false;
     }
 
-    // Clamp player position
-    gameState.player.x = Math.max(0, Math.min(canvas.width - gameState.player.width, gameState.player.x));
-
-    // Optimized bullet updates - remove bullets that are off screen
-    for (let i = gameState.bullets.length - 1; i >= 0; i--) {
-      const bullet = gameState.bullets[i];
-      bullet.y -= performanceMode ? 8 : 10; // Slightly slower on mobile for better control
-
-      if (bullet.y < 0) {
-        gameState.bullets.splice(i, 1);
-      }
+    // Check self collision
+    if (gameState.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      setHighScore(prev => Math.max(prev, score));
+      setGameOver(true);
+      setGameStarted(false);
+      return false;
     }
 
-    // Reduced spawn rate and enemy count for mobile
-    const maxEnemies = performanceMode ? 3 : 5;
-    const spawnRate = performanceMode ? 0.02 : 0.03;
-    
-    if (Math.random() < spawnRate && gameState.enemies.length < maxEnemies) {
-      const enemyWidth = performanceMode ? 35 : (40 + Math.floor(Math.random() * 20));
-      const enemyHeight = performanceMode ? 25 : (30 + Math.floor(Math.random() * 15));
-      
-      gameState.enemies.push({
-        x: Math.random() * (canvas.width - enemyWidth),
-        y: -enemyHeight,
-        width: enemyWidth,
-        height: enemyHeight,
-        health: 1 + Math.floor(score / 1000),
-        speed: performanceMode ? (0.8 + Math.random() * 1.2) : (1 + Math.random() * 1.5)
-      });
-    }
+    // Add new head
+    gameState.snake.unshift(head);
 
-    // Optimized collision detection
-    for (let i = gameState.enemies.length - 1; i >= 0; i--) {
-      const enemy = gameState.enemies[i];
-      enemy.y += enemy.speed;
-
-      let enemyHit = false;
-      
-      // Optimized bullet-enemy collision
-      for (let j = gameState.bullets.length - 1; j >= 0; j--) {
-        const bullet = gameState.bullets[j];
-        // Simplified collision check
-        if (bullet.x >= enemy.x && 
-            bullet.x <= enemy.x + enemy.width &&
-            bullet.y >= enemy.y &&
-            bullet.y <= enemy.y + enemy.height) {
-          
-          gameState.bullets.splice(j, 1);
-          enemy.health--;
-          
-          if (enemy.health <= 0) {
-            gameState.enemies.splice(i, 1);
-            setScore(prev => prev + 10);
-            
-            // Reduced lightning effect frequency on mobile
-            if (!performanceMode && Math.random() < 0.1) {
-              drawLightning(enemy.x, enemy.y);
-            }
-            enemyHit = true;
-            break;
-          }
-        }
-      }
-
-      if (enemyHit) continue;
-
-      // Optimized player-enemy collision
-      const player = gameState.player;
-      if (enemy.y + enemy.height > player.y &&
-          enemy.x < player.x + player.width &&
-          enemy.x + enemy.width > player.x &&
-          enemy.y < player.y + player.height) {
-        
-        setHighScore(prev => Math.max(prev, score));
-        setGameOver(true);
-        setGameStarted(false);
-        return false;
-      }
-
-      // Remove enemies that are off screen
-      if (enemy.y > canvas.height) {
-        gameState.enemies.splice(i, 1);
-      }
+    // Check food collision
+    if (head.x === gameState.food.x && head.y === gameState.food.y) {
+      setScore(prev => prev + 10);
+      generateFood();
+    } else {
+      // Remove tail if no food eaten
+      gameState.snake.pop();
     }
     
     return true;
-  }, [performanceMode, drawLightning]);
+  }, [generateFood]);
 
   const renderGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -182,76 +116,65 @@ export default function SpaceGame() {
     if (!ctx) return;
     
     const gameState = gameStateRef.current;
+    const gridSize = gameState.gridSize;
 
-    // Clear canvas with visible background
+    // Clear canvas
     ctx.fillStyle = '#080010';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Reduced grid lines for mobile performance
-    if (!performanceMode) {
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-      ctx.lineWidth = 1;
-      
-      for (let i = 0; i < canvas.height; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(canvas.width, i);
-        ctx.stroke();
-      }
+    // Draw grid
+    ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    
+    for (let x = 0; x < canvas.width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
     }
     
-    // Lightning effect (simplified for mobile)
-    if (gameState.lightningEffect.active) {
-      ctx.fillStyle = performanceMode ? 'rgba(255, 0, 255, 0.1)' : 'rgba(255, 0, 255, 0.2)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      gameState.lightningEffect.duration--;
-      if (gameState.lightningEffect.duration <= 0) {
-        gameState.lightningEffect.active = false;
+    for (let y = 0; y < canvas.height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    // Draw snake
+    gameState.snake.forEach((segment, index) => {
+      if (index === 0) {
+        // Snake head
+        ctx.fillStyle = '#00ff00';
+        ctx.shadowColor = '#00ff00';
+        ctx.shadowBlur = 10;
+      } else {
+        // Snake body
+        ctx.fillStyle = '#00aa00';
+        ctx.shadowColor = '#00aa00';
+        ctx.shadowBlur = 5;
       }
-    }
-
-    // Player rendering (always visible)
-    ctx.fillStyle = '#ff0050';
-    ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
-    
-    // Player center dot
-    ctx.fillStyle = '#ffff00';
-    ctx.beginPath();
-    ctx.arc(gameState.player.x + gameState.player.width / 2, gameState.player.y + 10, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Bullets (always visible)
-    ctx.fillStyle = '#00ffff';
-    for (const bullet of gameState.bullets) {
-      ctx.fillRect(bullet.x - 2, bullet.y, 4, 15);
-    }
-
-    // Enemies (always visible)
-    for (const enemy of gameState.enemies) {
-      ctx.fillStyle = '#4B2A5A';
-      ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
       
-      // Enemy details
-      ctx.fillStyle = '#ff5500';
-      ctx.beginPath();
-      ctx.arc(enemy.x + 10, enemy.y + 10, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(enemy.x + enemy.width - 10, enemy.y + 10, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+      ctx.fillRect(
+        segment.x * gridSize + 1, 
+        segment.y * gridSize + 1, 
+        gridSize - 2, 
+        gridSize - 2
+      );
+    });
+    ctx.shadowBlur = 0;
 
-    // Fog effect (reduced for mobile)
-    if (!performanceMode) {
-      const fogGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      fogGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-      fogGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.2)');
-      fogGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-      ctx.fillStyle = fogGradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-  }, [performanceMode]);
+    // Draw food
+    ctx.fillStyle = '#ff0000';
+    ctx.shadowColor = '#ff0000';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(
+      gameState.food.x * gridSize + 2, 
+      gameState.food.y * gridSize + 2, 
+      gridSize - 4, 
+      gridSize - 4
+    );
+    ctx.shadowBlur = 0;
+  }, []);
   
   useEffect(() => {
     if (!gameStarted) return;
@@ -259,106 +182,98 @@ export default function SpaceGame() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
+    // Initialize game state
     gameStateRef.current = {
-      player: {
-        x: canvas.width / 2,
-        y: canvas.height - 30,
-        width: 30,
-        height: 30,
-        speed: 5
-      },
-      bullets: [],
-      enemies: [],
-      mousePosition: { x: canvas.width / 2, y: 0 },
-      lightningEffect: { active: false, duration: 0, x: 0, y: 0 }
+      snake: [{ x: 10, y: 10 }],
+      food: { x: 15, y: 15 },
+      direction: { x: 0, y: 0 },
+      nextDirection: { x: 0, y: 0 },
+      gridSize: 20,
+      gameSpeed: isMobile ? 200 : 150
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      gameStateRef.current.mousePosition.x = e.clientX - rect.left;
-      gameStateRef.current.mousePosition.y = e.clientY - rect.top;
-    };
+    generateFood();
 
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      const touch = e.touches[0];
-      if (touch) {
-        gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
-        gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
-      }
-    };
-
-    const handleMouseClick = useCallback(() => {
-      gameStateRef.current.bullets.push({
-        x: gameStateRef.current.player.x + gameStateRef.current.player.width / 2,
-        y: gameStateRef.current.player.y
-      });
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const gameState = gameStateRef.current;
       
-      // Only play audio if not in performance mode
-      if (!performanceMode) {
-        const audio = new Audio('https://www.myinstants.com/media/sounds/laser.mp3');
-        audio.volume = 0.1;
-        audio.play().catch(() => {}); // Ignore audio errors
-      }
-    }, [performanceMode]);
-
-    const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      const touch = e.touches[0];
-      if (touch) {
-        gameStateRef.current.mousePosition.x = touch.clientX - rect.left;
-        gameStateRef.current.mousePosition.y = touch.clientY - rect.top;
-        handleMouseClick();
+      switch(e.key) {
+        case 'ArrowUp':
+          if (gameState.direction.y === 0) {
+            gameState.nextDirection = { x: 0, y: -1 };
+          }
+          break;
+        case 'ArrowDown':
+          if (gameState.direction.y === 0) {
+            gameState.nextDirection = { x: 0, y: 1 };
+          }
+          break;
+        case 'ArrowLeft':
+          if (gameState.direction.x === 0) {
+            gameState.nextDirection = { x: -1, y: 0 };
+          }
+          break;
+        case 'ArrowRight':
+          if (gameState.direction.x === 0) {
+            gameState.nextDirection = { x: 1, y: 0 };
+          }
+          break;
       }
     };
 
-    // Add event listeners with proper options for mobile
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('click', handleMouseClick);
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    
-    // Additional mobile-specific events
-    if (isMobile) {
-      canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
-      canvas.addEventListener('touchcancel', (e) => e.preventDefault(), { passive: false });
-    }
+    const handleTouch = (e: TouchEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      const gameState = gameStateRef.current;
+      const dx = x - centerX;
+      const dy = y - centerY;
+      
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal swipe
+        if (dx > 0 && gameState.direction.x === 0) {
+          gameState.nextDirection = { x: 1, y: 0 };
+        } else if (dx < 0 && gameState.direction.x === 0) {
+          gameState.nextDirection = { x: -1, y: 0 };
+        }
+      } else {
+        // Vertical swipe
+        if (dy > 0 && gameState.direction.y === 0) {
+          gameState.nextDirection = { x: 0, y: 1 };
+        } else if (dy < 0 && gameState.direction.y === 0) {
+          gameState.nextDirection = { x: 0, y: -1 };
+        }
+      }
+    };
 
-    let animationId: number;
+    window.addEventListener('keydown', handleKeyPress);
+    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+
+    let gameInterval: NodeJS.Timeout;
     
     const gameLoop = () => {
-      if (!gameStarted) return;
-      
       const gameRunning = updateGameState();
       if (!gameRunning) return;
       
       renderGame();
       
-      animationId = requestAnimationFrame(gameLoop);
+      gameInterval = setTimeout(gameLoop, gameStateRef.current.gameSpeed);
     };
 
-    animationId = requestAnimationFrame(gameLoop);
+    gameInterval = setTimeout(gameLoop, gameStateRef.current.gameSpeed);
 
     return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('click', handleMouseClick);
-      canvas.removeEventListener('touchstart', handleTouchStart);
-      
-      // Remove mobile-specific event listeners
-      if (isMobile) {
-        canvas.removeEventListener('touchend', (e) => e.preventDefault());
-        canvas.removeEventListener('touchcancel', (e) => e.preventDefault());
-      }
-      
-      cancelAnimationFrame(animationId);
+      window.removeEventListener('keydown', handleKeyPress);
+      canvas.removeEventListener('touchstart', handleTouch);
+      clearTimeout(gameInterval);
     };
-  }, [gameStarted]);
+  }, [gameStarted, isMobile, updateGameState, renderGame, generateFood]);
 
   const startGame = () => {
     setGameStarted(true);
@@ -367,11 +282,10 @@ export default function SpaceGame() {
   };
 
   return (
-    <div className={`${isMobile ? 'py-4' : 'min-h-screen pt-20'} px-4 relative`}>
-      <div className={`${isMobile ? 'max-w-sm mx-auto' : ''}`}>
-        <RetroFrame className={`${isMobile ? 'max-w-sm' : 'max-w-2xl'} mx-auto ${isMobile ? 'max-h-[400px] overflow-hidden' : ''}`} variant="dark">
+    <div className="min-h-screen pt-20 px-4 relative">
+      <RetroFrame className="max-w-2xl mx-auto" variant="dark">
         <div className="text-center">
-          <p className={`font-vt323 text-pink-500 ${isMobile ? 'mb-2 text-sm' : 'mb-4 text-xl'}`}>
+          <p className="font-vt323 text-xl text-pink-500 mb-4">
             SCORE: <span className="text-cyan-400">{score}</span> | 
             HI-SCORE: <span className="text-cyan-400">{highScore}</span>
           </p>
@@ -379,72 +293,52 @@ export default function SpaceGame() {
           {!gameStarted ? (
             <button
               onClick={startGame}
-              className={`bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 rounded-lg transition-all tracking-widest glow-button ${isMobile ? 'text-sm px-4 py-2 mb-2' : 'text-xl px-6 py-3 mb-4'}`}
+              className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 text-xl px-6 py-3 rounded-lg transition-all mb-4 tracking-widest glow-button"
             >
               {gameOver ? 'TRY AGAIN' : 'START GAME'}
             </button>
           ) : null}
           
-          <div className={`relative w-full mx-auto ${isMobile ? 'max-w-[280px] h-[210px]' : 'max-w-[600px] aspect-[3/2]'}`}>
+          <div className="relative w-full max-w-[600px] mx-auto aspect-[3/2]">
             <canvas
               ref={canvasRef}
-              width={isMobile ? 280 : 600}
-              height={isMobile ? 210 : 400}
+              width={isMobile ? 400 : 600}
+              height={isMobile ? 300 : 400}
               className="w-full h-full cursor-crosshair touch-none"
-              style={{ 
-                backgroundColor: '#080010',
-                touchAction: 'none',
-                userSelect: 'none',
-                display: 'block',
-                position: 'relative'
-              }}
+              style={{ backgroundColor: '#080010' }}
             />
             <div className="absolute inset-0 pointer-events-none scanline"></div>
-            {performanceMode && (
-              <div className="absolute top-2 left-2 bg-black/50 text-green-400 font-vt323 text-xs px-2 py-1 rounded">
-                PERFORMANCE MODE
-              </div>
-            )}
           </div>
           
-          <div className={`text-cyan-400/80 font-vt323 tracking-wide ${isMobile ? 'mt-2 text-xs' : 'mt-4 text-sm'}`}>
-            MOVE: {isMobile ? 'TOUCH' : 'MOUSE'} | FIRE: {isMobile ? 'TAP' : 'CLICK'}
+          <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
+            CONTROLS: {window.innerWidth <= 768 ? 'TOUCH TO SWIPE' : 'ARROW KEYS'}
           </div>
           
-          {isMobile && (
-            <div className="mt-2 p-2 bg-cyberpunk-black/50 border border-neon-cyan/30 rounded-lg">
-              <p className="font-vt323 text-neon-cyan text-xs text-center">
-                💡 TIP: Touch and drag to move, tap to shoot!
-              </p>
+          <div className="mt-10 relative overflow-hidden">
+            <div className="text-center">
+              <h3 className="font-vt323 text-2xl text-neon-pink mb-4 tracking-widest glow-text-pink">
+                TECHNICAL EXPERTISE
+              </h3>
+              <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-6"></div>
             </div>
-          )}
-          
-          {!isMobile && (
-            <div className="mt-10 relative overflow-hidden">
-              <div className="text-center">
-                <h3 className="font-vt323 text-2xl text-neon-pink mb-4 tracking-widest glow-text-pink">
-                  TECHNICAL EXPERTISE
-                </h3>
-                <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent mb-6"></div>
-              </div>
             
-            <div className={`bg-cyberpunk-black/40 border-2 border-neon-cyan glow-border-cyan rounded-lg relative ${isMobile ? 'p-3' : 'p-4'}`}>
+            <div className="bg-cyberpunk-black/40 border-2 border-neon-cyan glow-border-cyan p-4 rounded-lg relative">
               <div className="absolute -right-8 -top-8 w-24 h-24 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full blur-xl opacity-30"></div>
               <div className="absolute -left-8 -bottom-8 w-24 h-24 bg-gradient-to-tl from-neon-cyan to-neon-blue rounded-full blur-xl opacity-30"></div>
               
-              <p className={`text-white font-vt323 mb-4 relative z-10 ${isMobile ? 'text-sm' : 'text-lg'}`}>
+              <p className="text-white font-vt323 text-lg mb-4 relative z-10">
                 <span className="text-neon-pink">&gt; </span>
                 Specialized in full-stack development with expertise in React, Python machine learning, and C# applications. Building innovative solutions that bridge engineering and technology.
               </p>
               
-              <div className={`flex justify-center items-center relative z-10 ${isMobile ? 'space-x-2' : 'space-x-3'}`}>
-                <div className={`px-3 py-1 bg-neon-pink/20 text-neon-pink font-vt323 rounded-md border border-neon-pink ${isMobile ? 'text-xs' : 'text-sm'}`}>
+              <div className="flex justify-center items-center space-x-3 relative z-10">
+                <div className="px-3 py-1 bg-neon-pink/20 text-neon-pink font-vt323 rounded-md border border-neon-pink text-sm">
                   #PYTHON
                 </div>
-                <div className={`px-3 py-1 bg-neon-cyan/20 text-neon-cyan font-vt323 rounded-md border border-neon-cyan ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                <div className="px-3 py-1 bg-neon-cyan/20 text-neon-cyan font-vt323 rounded-md border border-neon-cyan text-sm">
                   #REACT
                 </div>
-                <div className={`px-3 py-1 bg-neon-purple/20 text-neon-purple font-vt323 rounded-md border border-neon-purple ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                <div className="px-3 py-1 bg-neon-purple/20 text-neon-purple font-vt323 rounded-md border border-neon-purple text-sm">
                   #C#
                 </div>
               </div>
@@ -452,10 +346,8 @@ export default function SpaceGame() {
               <div className="scanline absolute inset-0 pointer-events-none"></div>
             </div>
           </div>
-          )}
         </div>
       </RetroFrame>
-      </div>
     </div>
   );
 }
