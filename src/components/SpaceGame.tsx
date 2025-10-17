@@ -6,6 +6,16 @@ interface Position {
   y: number;
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  color: string;
+}
+
 export default function SpaceGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
@@ -13,6 +23,8 @@ export default function SpaceGame() {
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [level, setLevel] = useState(1);
+  const [speed, setSpeed] = useState(150);
   
   const gameStateRef = useRef({
     snake: [{ x: 10, y: 10 }] as Position[],
@@ -20,7 +32,11 @@ export default function SpaceGame() {
     direction: { x: 0, y: 0 } as Position,
     nextDirection: { x: 0, y: 0 } as Position,
     gridSize: 20,
-    gameSpeed: 150
+    gameSpeed: 150,
+    particles: [] as Particle[],
+    powerUps: [] as Position[],
+    specialFood: null as Position | null,
+    specialFoodTimer: 0
   });
 
   // Detect mobile device
@@ -37,6 +53,21 @@ export default function SpaceGame() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const createParticles = useCallback((x: number, y: number, color: string, count: number = 5) => {
+    const gameState = gameStateRef.current;
+    for (let i = 0; i < count; i++) {
+      gameState.particles.push({
+        x: x * gameState.gridSize + gameState.gridSize / 2,
+        y: y * gameState.gridSize + gameState.gridSize / 2,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        life: 30,
+        maxLife: 30,
+        color: color
+      });
+    }
   }, []);
 
   const generateFood = useCallback(() => {
@@ -58,12 +89,43 @@ export default function SpaceGame() {
     ));
     
     gameStateRef.current.food = newFood;
+    
+    // Chance for special food
+    if (Math.random() < 0.1) {
+      gameStateRef.current.specialFood = newFood;
+      gameStateRef.current.specialFoodTimer = 300; // 5 seconds at 60fps
+    }
+  }, []);
+
+  const updateParticles = useCallback(() => {
+    const gameState = gameStateRef.current;
+    for (let i = gameState.particles.length - 1; i >= 0; i--) {
+      const particle = gameState.particles[i];
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.life--;
+      
+      if (particle.life <= 0) {
+        gameState.particles.splice(i, 1);
+      }
+    }
   }, []);
 
   const updateGameState = useCallback(() => {
     const gameState = gameStateRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return true;
+
+    // Update particles
+    updateParticles();
+
+    // Update special food timer
+    if (gameState.specialFoodTimer > 0) {
+      gameState.specialFoodTimer--;
+      if (gameState.specialFoodTimer === 0) {
+        gameState.specialFood = null;
+      }
+    }
 
     // Update direction
     gameState.direction = { ...gameState.nextDirection };
@@ -98,7 +160,19 @@ export default function SpaceGame() {
 
     // Check food collision
     if (head.x === gameState.food.x && head.y === gameState.food.y) {
-      setScore(prev => prev + 10);
+      const points = gameState.specialFood ? 50 : 10;
+      setScore(prev => {
+        const newScore = prev + points;
+        // Level up every 100 points
+        const newLevel = Math.floor(newScore / 100) + 1;
+        if (newLevel > level) {
+          setLevel(newLevel);
+          setSpeed(prev => Math.max(80, prev - 10)); // Increase speed, min 80ms
+        }
+        return newScore;
+      });
+      
+      createParticles(head.x, head.y, gameState.specialFood ? '#ff00ff' : '#00ff00', 8);
       generateFood();
     } else {
       // Remove tail if no food eaten
@@ -106,7 +180,7 @@ export default function SpaceGame() {
     }
     
     return true;
-  }, [generateFood]);
+  }, [generateFood, updateParticles, createParticles, level]);
 
   const renderGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -118,12 +192,16 @@ export default function SpaceGame() {
     const gameState = gameStateRef.current;
     const gridSize = gameState.gridSize;
 
-    // Clear canvas
-    ctx.fillStyle = '#080010';
+    // Clear canvas with animated background
+    const time = Date.now() * 0.001;
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, `hsl(${(240 + Math.sin(time) * 20) % 360}, 50%, 5%)`);
+    gradient.addColorStop(1, `hsl(${(280 + Math.cos(time) * 20) % 360}, 50%, 8%)`);
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw grid
-    ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+    // Draw animated grid
+    ctx.strokeStyle = `rgba(0, 255, 255, ${0.1 + Math.sin(time * 2) * 0.05})`;
     ctx.lineWidth = 1;
     
     for (let x = 0; x < canvas.width; x += gridSize) {
@@ -140,39 +218,101 @@ export default function SpaceGame() {
       ctx.stroke();
     }
 
-    // Draw snake
-    gameState.snake.forEach((segment, index) => {
-      if (index === 0) {
-        // Snake head
-        ctx.fillStyle = '#00ff00';
-        ctx.shadowColor = '#00ff00';
-        ctx.shadowBlur = 10;
-      } else {
-        // Snake body
-        ctx.fillStyle = '#00aa00';
-        ctx.shadowColor = '#00aa00';
-        ctx.shadowBlur = 5;
-      }
-      
-      ctx.fillRect(
-        segment.x * gridSize + 1, 
-        segment.y * gridSize + 1, 
-        gridSize - 2, 
-        gridSize - 2
-      );
+    // Draw particles
+    gameState.particles.forEach(particle => {
+      const alpha = particle.life / particle.maxLife;
+      ctx.fillStyle = particle.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+      ctx.shadowColor = particle.color;
+      ctx.shadowBlur = 5;
+      ctx.fillRect(particle.x - 2, particle.y - 2, 4, 4);
     });
     ctx.shadowBlur = 0;
 
-    // Draw food
-    ctx.fillStyle = '#ff0000';
-    ctx.shadowColor = '#ff0000';
-    ctx.shadowBlur = 10;
-    ctx.fillRect(
-      gameState.food.x * gridSize + 2, 
-      gameState.food.y * gridSize + 2, 
-      gridSize - 4, 
-      gridSize - 4
-    );
+    // Draw snake with gradient
+    gameState.snake.forEach((segment, index) => {
+      const x = segment.x * gridSize + 1;
+      const y = segment.y * gridSize + 1;
+      const size = gridSize - 2;
+      
+      if (index === 0) {
+        // Snake head with pulsing effect
+        const pulse = 1 + Math.sin(time * 8) * 0.1;
+        const headGradient = ctx.createRadialGradient(
+          x + size/2, y + size/2, 0,
+          x + size/2, y + size/2, size/2
+        );
+        headGradient.addColorStop(0, '#00ff88');
+        headGradient.addColorStop(1, '#00aa44');
+        
+        ctx.fillStyle = headGradient;
+        ctx.shadowColor = '#00ff88';
+        ctx.shadowBlur = 15;
+        ctx.fillRect(x, y, size * pulse, size * pulse);
+        
+        // Eyes
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x + size/3, y + size/3, 3, 3);
+        ctx.fillRect(x + size*2/3, y + size/3, 3, 3);
+      } else {
+        // Snake body with gradient
+        const bodyGradient = ctx.createLinearGradient(x, y, x + size, y + size);
+        const intensity = Math.max(0.3, 1 - (index / gameState.snake.length));
+        bodyGradient.addColorStop(0, `rgba(0, ${Math.floor(255 * intensity)}, ${Math.floor(170 * intensity)}, 0.8)`);
+        bodyGradient.addColorStop(1, `rgba(0, ${Math.floor(170 * intensity)}, ${Math.floor(85 * intensity)}, 0.6)`);
+        
+        ctx.fillStyle = bodyGradient;
+        ctx.shadowColor = '#00aa00';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(x, y, size, size);
+      }
+    });
+    ctx.shadowBlur = 0;
+
+    // Draw food with special effects
+    const foodX = gameState.food.x * gridSize + 2;
+    const foodY = gameState.food.y * gridSize + 2;
+    const foodSize = gridSize - 4;
+    
+    if (gameState.specialFood) {
+      // Special food with pulsing rainbow effect
+      const rainbowTime = time * 3;
+      const hue = (rainbowTime * 50) % 360;
+      const foodGradient = ctx.createRadialGradient(
+        foodX + foodSize/2, foodY + foodSize/2, 0,
+        foodX + foodSize/2, foodY + foodSize/2, foodSize/2
+      );
+      foodGradient.addColorStop(0, `hsl(${hue}, 100%, 60%)`);
+      foodGradient.addColorStop(1, `hsl(${(hue + 60) % 360}, 100%, 40%)`);
+      
+      ctx.fillStyle = foodGradient;
+      ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+      ctx.shadowBlur = 20;
+      ctx.fillRect(foodX, foodY, foodSize, foodSize);
+      
+      // Sparkle effect
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowBlur = 0;
+      for (let i = 0; i < 4; i++) {
+        const angle = (rainbowTime + i * Math.PI/2) * 2;
+        const sparkleX = foodX + foodSize/2 + Math.cos(angle) * foodSize/3;
+        const sparkleY = foodY + foodSize/2 + Math.sin(angle) * foodSize/3;
+        ctx.fillRect(sparkleX - 1, sparkleY - 1, 2, 2);
+      }
+    } else {
+      // Regular food
+      const foodGradient = ctx.createRadialGradient(
+        foodX + foodSize/2, foodY + foodSize/2, 0,
+        foodX + foodSize/2, foodY + foodSize/2, foodSize/2
+      );
+      foodGradient.addColorStop(0, '#ff4444');
+      foodGradient.addColorStop(1, '#aa0000');
+      
+      ctx.fillStyle = foodGradient;
+      ctx.shadowColor = '#ff0000';
+      ctx.shadowBlur = 15;
+      ctx.fillRect(foodX, foodY, foodSize, foodSize);
+    }
     ctx.shadowBlur = 0;
   }, []);
   
@@ -189,7 +329,11 @@ export default function SpaceGame() {
       direction: { x: 1, y: 0 }, // Start moving right
       nextDirection: { x: 1, y: 0 },
       gridSize: 20,
-      gameSpeed: isMobile ? 200 : 150
+      gameSpeed: speed,
+      particles: [],
+      powerUps: [],
+      specialFood: null,
+      specialFoodTimer: 0
     };
 
     generateFood();
@@ -269,10 +413,10 @@ export default function SpaceGame() {
       
       renderGame();
       
-      gameInterval = setTimeout(gameLoop, gameStateRef.current.gameSpeed);
+      gameInterval = setTimeout(gameLoop, speed);
     };
 
-    gameInterval = setTimeout(gameLoop, gameStateRef.current.gameSpeed);
+    gameInterval = setTimeout(gameLoop, speed);
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
@@ -286,16 +430,24 @@ export default function SpaceGame() {
     setGameStarted(true);
     setGameOver(false);
     setScore(0);
+    setLevel(1);
+    setSpeed(150);
   };
 
   return (
     <div className="min-h-screen pt-20 px-4 relative">
       <RetroFrame className="max-w-2xl mx-auto" variant="dark">
         <div className="text-center">
-          <p className="font-vt323 text-xl text-pink-500 mb-4">
-            SCORE: <span className="text-cyan-400">{score}</span> | 
-            HI-SCORE: <span className="text-cyan-400">{highScore}</span>
-          </p>
+          <div className="font-vt323 text-lg text-pink-500 mb-4 space-y-1">
+            <div className="flex justify-center space-x-6">
+              <span>SCORE: <span className="text-cyan-400">{score}</span></span>
+              <span>HI-SCORE: <span className="text-cyan-400">{highScore}</span></span>
+            </div>
+            <div className="flex justify-center space-x-6">
+              <span>LEVEL: <span className="text-yellow-400">{level}</span></span>
+              <span>SPEED: <span className="text-green-400">{Math.round(150/speed * 100)}%</span></span>
+            </div>
+          </div>
           
           {!gameStarted ? (
             <button
@@ -317,8 +469,11 @@ export default function SpaceGame() {
             <div className="absolute inset-0 pointer-events-none scanline"></div>
           </div>
           
-          <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
-            CONTROLS: {window.innerWidth <= 768 ? 'TOUCH TO SWIPE' : 'ARROW KEYS'}
+          <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide space-y-1">
+            <div>CONTROLS: {window.innerWidth <= 768 ? 'TOUCH TO SWIPE' : 'ARROW KEYS'}</div>
+            <div className="text-xs text-cyan-400/60">
+              🎯 Regular food: +10 points | 🌟 Special food: +50 points | Level up every 100 points
+            </div>
           </div>
           
           <div className="mt-10 relative overflow-hidden">
