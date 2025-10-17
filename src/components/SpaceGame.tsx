@@ -186,8 +186,8 @@ export default function SpaceGame() {
     gameStateRef.current = {
       snake: [{ x: 10, y: 10 }],
       food: { x: 15, y: 15 },
-      direction: { x: 0, y: 0 },
-      nextDirection: { x: 0, y: 0 },
+      direction: { x: 1, y: 0 }, // Start moving right
+      nextDirection: { x: 1, y: 0 },
       gridSize: 20,
       gameSpeed: isMobile ? 200 : 150
     };
@@ -252,8 +252,14 @@ export default function SpaceGame() {
       }
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      handleTouch(e);
+    };
+
     window.addEventListener('keydown', handleKeyPress);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     let gameInterval: NodeJS.Timeout;
     
@@ -271,9 +277,10 @@ export default function SpaceGame() {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       canvas.removeEventListener('touchstart', handleTouch);
+      canvas.removeEventListener('touchmove', handleTouchMove);
       clearTimeout(gameInterval);
     };
-  }, [gameStarted, isMobile, updateGameState, renderGame, generateFood]);
+  }, [gameStarted, isMobile]);
 
   const startGame = () => {
     setGameStarted(true);
