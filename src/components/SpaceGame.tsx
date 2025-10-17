@@ -330,20 +330,9 @@ export default function SpaceGame() {
     }
 
     let animationId: number;
-    let lastTime = 0;
-    // Reduced FPS for mobile devices
-    const fps = performanceMode ? 30 : 60;
-    const frameTime = 1000 / fps;
     
-    const gameLoop = (timestamp: number) => {
+    const gameLoop = () => {
       if (!gameStarted) return;
-      
-      const elapsed = timestamp - lastTime;
-      if (elapsed < frameTime) {
-        animationId = requestAnimationFrame(gameLoop);
-        return;
-      }
-      lastTime = timestamp - (elapsed % frameTime);
       
       const gameRunning = updateGameState();
       if (!gameRunning) return;
