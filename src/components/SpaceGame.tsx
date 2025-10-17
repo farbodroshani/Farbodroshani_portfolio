@@ -53,19 +53,6 @@ export default function SpaceGame() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Initialize canvas when component mounts
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        // Set initial background
-        ctx.fillStyle = '#080010';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        console.log('Canvas initialized with dimensions:', canvas.width, 'x', canvas.height);
-      }
-    }
-  }, []);
 
   const drawLightning = useCallback((x: number, y: number) => {
     const gameState = gameStateRef.current;
@@ -189,21 +176,14 @@ export default function SpaceGame() {
 
   const renderGame = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      console.log('Canvas not found');
-      return;
-    }
+    if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.log('Canvas context not found');
-      return;
-    }
+    if (!ctx) return;
     
     const gameState = gameStateRef.current;
-    console.log('Rendering game, player at:', gameState.player.x, gameState.player.y);
 
-    // Clear canvas
+    // Clear canvas with visible background
     ctx.fillStyle = '#080010';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -231,14 +211,9 @@ export default function SpaceGame() {
       }
     }
 
-    // Player rendering (optimized shadows)
-    if (!performanceMode) {
-      ctx.shadowColor = '#ff00ff';
-      ctx.shadowBlur = 10;
-    }
+    // Player rendering (always visible)
     ctx.fillStyle = '#ff0050';
     ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
-    if (!performanceMode) ctx.shadowBlur = 0;
     
     // Player center dot
     ctx.fillStyle = '#ffff00';
@@ -246,37 +221,25 @@ export default function SpaceGame() {
     ctx.arc(gameState.player.x + gameState.player.width / 2, gameState.player.y + 10, 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Bullets (batch rendering for better performance)
+    // Bullets (always visible)
     ctx.fillStyle = '#00ffff';
-    if (!performanceMode) {
-      ctx.shadowColor = '#00ffff';
-      ctx.shadowBlur = 10;
-    }
     for (const bullet of gameState.bullets) {
       ctx.fillRect(bullet.x - 2, bullet.y, 4, 15);
     }
-    if (!performanceMode) ctx.shadowBlur = 0;
 
-    // Enemies (simplified rendering for mobile)
+    // Enemies (always visible)
     for (const enemy of gameState.enemies) {
-      if (!performanceMode) {
-        ctx.shadowColor = '#ff00ff';
-        ctx.shadowBlur = 10;
-      }
       ctx.fillStyle = '#4B2A5A';
       ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-      if (!performanceMode) ctx.shadowBlur = 0;
       
-      // Simplified enemy details for mobile
-      if (!performanceMode) {
-        ctx.fillStyle = '#ff5500';
-        ctx.beginPath();
-        ctx.arc(enemy.x + 10, enemy.y + 10, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(enemy.x + enemy.width - 10, enemy.y + 10, 5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      // Enemy details
+      ctx.fillStyle = '#ff5500';
+      ctx.beginPath();
+      ctx.arc(enemy.x + 10, enemy.y + 10, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(enemy.x + enemy.width - 10, enemy.y + 10, 5, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     // Fog effect (reduced for mobile)
@@ -373,10 +336,7 @@ export default function SpaceGame() {
     const frameTime = 1000 / fps;
     
     const gameLoop = (timestamp: number) => {
-      if (!gameStarted) {
-        console.log('Game not started, stopping loop');
-        return;
-      }
+      if (!gameStarted) return;
       
       const elapsed = timestamp - lastTime;
       if (elapsed < frameTime) {
@@ -386,10 +346,7 @@ export default function SpaceGame() {
       lastTime = timestamp - (elapsed % frameTime);
       
       const gameRunning = updateGameState();
-      if (!gameRunning) {
-        console.log('Game stopped, ending loop');
-        return;
-      }
+      if (!gameRunning) return;
       
       renderGame();
       
@@ -444,12 +401,13 @@ export default function SpaceGame() {
               ref={canvasRef}
               width={isMobile ? 280 : 600}
               height={isMobile ? 210 : 400}
-              className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"
+              className="w-full h-full cursor-crosshair touch-none"
               style={{ 
                 backgroundColor: '#080010',
                 touchAction: 'none',
                 userSelect: 'none',
-                display: 'block'
+                display: 'block',
+                position: 'relative'
               }}
             />
             <div className="absolute inset-0 pointer-events-none scanline"></div>
