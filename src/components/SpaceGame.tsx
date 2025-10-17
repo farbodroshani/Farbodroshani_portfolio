@@ -395,9 +395,10 @@ export default function SpaceGame() {
 
   return (
     <div className={`${isMobile ? 'py-4' : 'min-h-screen pt-20'} px-4 relative`}>
-      <RetroFrame className={`${isMobile ? 'max-w-sm' : 'max-w-2xl'} mx-auto`} variant="dark">
+      <div className={`${isMobile ? 'max-w-sm mx-auto' : ''}`}>
+        <RetroFrame className={`${isMobile ? 'max-w-sm' : 'max-w-2xl'} mx-auto ${isMobile ? 'max-h-[400px] overflow-hidden' : ''}`} variant="dark">
         <div className="text-center">
-          <p className={`font-vt323 text-pink-500 mb-4 ${isMobile ? 'text-lg' : 'text-xl'}`}>
+          <p className={`font-vt323 text-pink-500 ${isMobile ? 'mb-2 text-sm' : 'mb-4 text-xl'}`}>
             SCORE: <span className="text-cyan-400">{score}</span> | 
             HI-SCORE: <span className="text-cyan-400">{highScore}</span>
           </p>
@@ -405,17 +406,17 @@ export default function SpaceGame() {
           {!gameStarted ? (
             <button
               onClick={startGame}
-              className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 text-xl px-6 py-3 rounded-lg transition-all mb-4 tracking-widest glow-button"
+              className={`bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-vt323 rounded-lg transition-all tracking-widest glow-button ${isMobile ? 'text-sm px-4 py-2 mb-2' : 'text-xl px-6 py-3 mb-4'}`}
             >
               {gameOver ? 'TRY AGAIN' : 'START GAME'}
             </button>
           ) : null}
           
-          <div className={`relative w-full mx-auto ${isMobile ? 'max-w-[300px] aspect-[4/3]' : 'max-w-[600px] aspect-[3/2]'}`}>
+          <div className={`relative w-full mx-auto ${isMobile ? 'max-w-[280px] h-[210px]' : 'max-w-[600px] aspect-[3/2]'}`}>
             <canvas
               ref={canvasRef}
-              width={isMobile ? 300 : 600}
-              height={isMobile ? 225 : 400}
+              width={isMobile ? 280 : 600}
+              height={isMobile ? 210 : 400}
               className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"
               style={{ 
                 backgroundColor: '#080010',
@@ -431,13 +432,13 @@ export default function SpaceGame() {
             )}
           </div>
           
-          <div className="mt-4 text-cyan-400/80 font-vt323 text-sm tracking-wide">
+          <div className={`text-cyan-400/80 font-vt323 tracking-wide ${isMobile ? 'mt-2 text-xs' : 'mt-4 text-sm'}`}>
             MOVE: {isMobile ? 'TOUCH' : 'MOUSE'} | FIRE: {isMobile ? 'TAP' : 'CLICK'}
           </div>
           
           {isMobile && (
-            <div className="mt-4 p-4 bg-cyberpunk-black/50 border border-neon-cyan/30 rounded-lg">
-              <p className="font-vt323 text-neon-cyan text-sm text-center">
+            <div className="mt-2 p-2 bg-cyberpunk-black/50 border border-neon-cyan/30 rounded-lg">
+              <p className="font-vt323 text-neon-cyan text-xs text-center">
                 💡 TIP: Touch and drag to move, tap to shoot!
               </p>
             </div>
@@ -479,6 +480,7 @@ export default function SpaceGame() {
           )}
         </div>
       </RetroFrame>
+      </div>
     </div>
   );
 }
