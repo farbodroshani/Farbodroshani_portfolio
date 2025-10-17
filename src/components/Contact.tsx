@@ -60,7 +60,7 @@ export default function Contact() {
                 TRANSMISSION FORM
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" data-netlify="true">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-vt323 text-neon-cyan mb-2 text-sm tracking-wide">
