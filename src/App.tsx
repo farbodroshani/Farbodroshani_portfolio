@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, useLocation, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import SpaceGame from './components/SpaceGame';
 import Bio from './components/Bio';
-import Terminal from './components/Terminal';
 import ProjectCarousel from './components/ProjectCarousel';
 import LoadingScreen from './components/LoadingScreen';
 import EffectsProvider from './components/EffectsProvider';
 import Footer from './components/Footer';
 import Artifacts from './components/Artifacts';
+import Contact from './components/Contact';
 import NeonRain from './components/NeonRain';
 import './styles/effects.css';
 import '@fontsource/bodoni-moda/700';
@@ -41,24 +41,6 @@ function HomePage() {
   );
 }
 
-// Dimension01 page content
-function DimensionPage() {
-  return (
-    <div className="min-h-screen pt-24">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="font-vt323 text-5xl md:text-6xl text-center mb-8 text-neon-cyan glow-text-cyan">
-          <GlitchText intensity="medium" triggerProbability={0.25} triggerInterval={5000}>
-            DIMENSION_01
-          </GlitchText>
-        </h1>
-        <div className="h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent mb-12"></div>
-        
-        {/* Terminal component */}
-        <Terminal />
-      </div>
-    </div>
-  );
-}
 
 // Dragon Combat page content
 function DragonCombatPage() {
@@ -86,7 +68,6 @@ function DragonCombatPage() {
 
 function App() {
   const location = useLocation();
-  const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
   
   // State for loading screen
@@ -102,9 +83,6 @@ function App() {
         case '/':
           text = "INITIALIZING HOME SEQUENCE";
           break;
-        case '/dimension':
-          text = "ACCESSING DIMENSION_01";
-          break;
         case '/projects':
           text = "RETRIEVING ARTIFACTS";
           break;
@@ -113,6 +91,9 @@ function App() {
           break;
         case '/artifacts':
           text = "ACCESSING ARTIFACT VAULT";
+          break;
+        case '/contact':
+          text = "INITIALIZING CONTACT UPLINK";
           break;
         default:
           text = "SYSTEM BOOTING";
@@ -289,11 +270,10 @@ function App() {
               <main className="flex-grow">
                 <Routes location={location} key={location.pathname}>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/dimension" element={<DimensionPage />} />
                   <Route path="/projects" element={<ProjectCarousel />} />
-                  <Route path="/terminal" element={<Terminal />} />
                   <Route path="/game" element={<DragonCombatPage />} />
                   <Route path="/artifacts" element={<Artifacts />} />
+                  <Route path="/contact" element={<Contact />} />
                 </Routes>
               </main>
             )}

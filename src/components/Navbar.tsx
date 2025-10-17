@@ -67,13 +67,9 @@ function NavLinks() {
   return (
     <>
       <Link to="/" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">HOME</Link>
-      <Link to="/dimension" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">
-        <GlitchText intensity="subtle" triggerProbability={0.15} triggerInterval={10000}>
-          DIMENSION_01
-        </GlitchText>
-      </Link>
       <Link to="/artifacts" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">ARTIFACTS</Link>
       <Link to="/game" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">DRAGON_COMBAT</Link>
+      <Link to="/contact" className="font-vt323 text-lg text-white hover:text-neon-cyan transition-colors tracking-wider nav-link">CONTACT</Link>
     </>
   );
 }
@@ -90,7 +86,7 @@ function SocialLinks() {
         <Github size={20} />
       </a>
       <a
-        href="https://instagram.com/farbod.roshanii"
+        href="https://instagram.com/farbodroshanii"
         target="_blank"
         rel="noopener noreferrer"
         className="text-neon-cyan hover:text-neon-pink transition-colors social-icon"

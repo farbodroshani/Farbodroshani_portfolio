@@ -34,19 +34,19 @@ export default function Bio() {
               <div className="font-vt323 text-lg space-y-4 text-white">
                 <p className="text-neon-cyan tracking-wide">
                   <span className="text-neon-pink">&gt; </span>
-                  COMMANDER FARBOD ROSHANI, CYBER DRAGON DIVISION
+                  FARBOD ROSHANI, SOFTWARE ENGINEER & CIVIL ENGINEER
                 </p>
                 
                 <p className="tracking-wide">
-                  Specialized in digital warfare and tactical coding operations. Born in the neon wastelands of Silicon Valley, raised by a family of sentient AI bots.
+                  I am a versatile professional with expertise in software development, machine learning, and civil engineering. Currently pursuing my Master's degree in Civil Engineering, Road and Transportation at Amirkabir University, building upon my Bachelor's degree in Civil Engineering from Tabriz University.
                 </p>
                 
                 <p className="tracking-wide">
-                  Through years of combat in the virtual trenches, I've harnessed the ancient powers of JavaScript, TypeScript, and React. My arsenal includes Python-powered data weapons and node.js tactical modules.
+                  With extensive experience in Python for machine learning applications and C# development, I have successfully designed and developed over 20+ websites using React frameworks. My technical arsenal includes expertise in PR/KOL management, data analysis, and full-stack web development.
                 </p>
                 
                 <p className="tracking-wide">
-                  <span className="text-neon-pink inline-block animate-pulse">!</span> When not hunting bugs in the digital realm, I command elite squads in tabletop strategy games and decode ancient scrolls of programming wisdom.
+                  <span className="text-neon-pink inline-block animate-pulse">!</span> Combining my engineering background with cutting-edge software development skills, I create innovative solutions that bridge the gap between traditional engineering and modern technology.
                 </p>
                 
                 <div className="pt-4 flex space-x-4 justify-center md:justify-start">
@@ -69,7 +69,7 @@ export default function Bio() {
                     CONTACT UPLINK
                   </motion.button>
                   <a
-                    href="https://instagram.com/farbod.roshanii"
+                    href="https://instagram.com/farbodroshanii"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neon-cyan hover:text-neon-pink transition-colors social-icon"
@@ -85,8 +85,8 @@ export default function Bio() {
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
-                <span className="font-vt323 text-neon-cyan">CODING POWER</span>
-                <span className="font-vt323 text-neon-pink">9000+</span>
+                <span className="font-vt323 text-neon-cyan">PYTHON/ML</span>
+                <span className="font-vt323 text-neon-pink">95%</span>
               </div>
               <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan" style={{width: '95%'}}></div>
@@ -95,18 +95,18 @@ export default function Bio() {
             
             <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
-                <span className="font-vt323 text-neon-cyan">DRAGON ENERGY</span>
-                <span className="font-vt323 text-neon-pink">87%</span>
+                <span className="font-vt323 text-neon-cyan">REACT/C#</span>
+                <span className="font-vt323 text-neon-pink">90%</span>
               </div>
               <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan" style={{width: '87%'}}></div>
+                <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan" style={{width: '90%'}}></div>
               </div>
             </div>
             
             <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
-                <span className="font-vt323 text-neon-cyan">COMBAT REFLEXES</span>
-                <span className="font-vt323 text-neon-pink">LETHAL</span>
+                <span className="font-vt323 text-neon-cyan">WEBSITES BUILT</span>
+                <span className="font-vt323 text-neon-pink">20+</span>
               </div>
               <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink" style={{width: '100%'}}></div>
@@ -115,8 +115,8 @@ export default function Bio() {
             
             <div className="max-w-xs mx-auto w-full">
               <div className="flex justify-between mb-1">
-                <span className="font-vt323 text-neon-cyan">COFFEE CONSUMED</span>
-                <span className="font-vt323 text-neon-pink">∞</span>
+                <span className="font-vt323 text-neon-cyan">EDUCATION LEVEL</span>
+                <span className="font-vt323 text-neon-pink">MASTER'S</span>
               </div>
               <div className="h-3 bg-cyberpunk-black/50 rounded overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-neon-pink to-neon-cyan animate-pulse" style={{width: '100%'}}></div>

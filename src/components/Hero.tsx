@@ -1,20 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import dragonImage from '../assets/dragon.png';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import GlitchText from './GlitchText';
 
 export default function Hero() {
-  const [showDragon, setShowDragon] = useState(true);
-  
-  useEffect(() => {
-    // Simple interval to toggle dragon visibility
-    const interval = setInterval(() => {
-      setShowDragon(prev => !prev);
-    }, showDragon ? 5000 : 10000);
-    
-    // Clear interval when component unmounts
-    return () => clearInterval(interval);
-  }, [showDragon]); // Re-run effect when showDragon changes
   
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16 pb-24">
@@ -63,15 +51,18 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
             </motion.a>
             
-            <motion.a 
-              href="#contact"
-              className="bg-neon-pink/20 text-neon-pink border-2 border-neon-pink/50 py-3 px-8 font-vt323 text-xl tracking-wide rounded-sm hover:bg-neon-pink/30 transition-colors relative overflow-hidden group"
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10">INITIATE CONTACT</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-pink/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-            </motion.a>
+              <Link 
+                to="/contact"
+                className="bg-neon-pink/20 text-neon-pink border-2 border-neon-pink/50 py-3 px-8 font-vt323 text-xl tracking-wide rounded-sm hover:bg-neon-pink/30 transition-colors relative overflow-hidden group block"
+              >
+                <span className="relative z-10">INITIATE CONTACT</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-pink/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+              </Link>
+            </motion.div>
           </div>
         </motion.div>
       </div>
@@ -102,24 +93,6 @@ export default function Hero() {
         className="absolute bottom-1/4 left-1/4 w-40 h-40 bg-gradient-to-tl from-neon-cyan/20 to-transparent rounded-full blur-xl"
       />
       
-      {/* PNG Dragon Image with appear/disappear animation */}
-      <AnimatePresence>
-        {showDragon && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.8 }}
-            className="absolute bottom-10 w-48 h-48 left-0 right-0 mx-auto flex items-center justify-center"
-          >
-            <img 
-              src={dragonImage} 
-              alt="Cyber Dragon"
-              className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
